@@ -1,6 +1,7 @@
 using System.Reflection;
 using Godot;
 using HarmonyLib;
+using DeltaruneActs.TP;
 using MegaCrit.Sts2.Core.Modding;
 using MegaCrit.Sts2.Core.Models;
 
@@ -18,6 +19,7 @@ public partial class ModMain : Node
         var assembly = Assembly.GetExecutingAssembly();
         var harmony = new Harmony(ModId);
         harmony.PatchAll(assembly);
+        TPHooks.Install(harmony);
 
         ModelDb.Inject(typeof(Cards.Check));
         ModelDb.Inject(typeof(Cards.Compliment));

@@ -23,13 +23,12 @@ public static class ActResolver
         if (target.IsDead || target.Monster is null)
             return false;
 
-        if (target.Monster.IsElite)
-            return GetProgress(target) >= 150;
-
-        if (target.Monster.IsBoss)
+        var typeName = target.Monster.GetType().Name;
+        if (typeName.Contains("Boss", StringComparison.OrdinalIgnoreCase))
             return false;
 
-        return GetProgress(target) >= 100;
+        var threshold = typeName.Contains("Elite", StringComparison.OrdinalIgnoreCase) ? 150 : 100;
+        return GetProgress(target) >= threshold;
     }
 
     public static void Remove(Creature target) => SpareProgress.Remove(target);

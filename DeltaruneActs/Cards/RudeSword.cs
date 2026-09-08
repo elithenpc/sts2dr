@@ -1,20 +1,17 @@
+using DeltaruneActs.TP;
+using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
+using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 
 namespace DeltaruneActs.Cards;
 
-[Pool(typeof(BasicCardPool))]
-public partial class RudeSword : DeltaruneActsCard
+public sealed class RudeSword : DeltaruneActsCard
 {
-    public override CardId Id => DeltaruneActsCardIds.RudeSword;
-    public override TargetType TargetType => TargetType.AnyEnemy;
-    public override int BaseCost => 50;
-    public override CardType CardType => CardType.Attack;
+    public RudeSword() : base(0, CardType.Attack, CardRarity.Rare, TargetType.AnyEnemy) { }
 
-    public override void OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)
+    protected override async Task OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)
     {
-        var target = cardPlay.Target as Creature;
-        if (target == null) return;
-        SpendTp(choiceContext, BaseCost);
-        DamageTarget(choiceContext, target, 24);
+        if (cardPlay.Target is null || cardPlay.Target.IsDead || !TPManager.Spend(50)) return;
+        await DamageCmd.Attack(24).FromCard(this, cardPlay).Targeting(cardPlay.Target).Execute(choiceContext);
     }
 }

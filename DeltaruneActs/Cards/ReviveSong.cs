@@ -1,18 +1,18 @@
+using DeltaruneActs.TP;
+using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
+using MegaCrit.Sts2.Core.Entities.Creatures;
+using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 
 namespace DeltaruneActs.Cards;
 
-[Pool(typeof(BasicCardPool))]
-public partial class ReviveSong : DeltaruneActsCard
+public sealed class ReviveSong : DeltaruneActsCard
 {
-    public override CardId Id => DeltaruneActsCardIds.ReviveSong;
-    public override TargetType TargetType => TargetType.AnyAlly;
-    public override int BaseCost => 84;
-    public override CardType CardType => CardType.Skill;
+    public ReviveSong() : base(0, CardType.Skill, CardRarity.Rare, TargetType.AnyAlly) { }
 
-    public override void OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)
+    protected override async Task OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)
     {
-        SpendTp(choiceContext, BaseCost);
-        HealTarget(choiceContext, cardPlay.Target as Creature, 25);
+        if (cardPlay.Target is not Creature target || !TPManager.Spend(84)) return;
+        await CreatureCmd.Heal(target, 25);
     }
 }

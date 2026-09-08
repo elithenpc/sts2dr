@@ -1,18 +1,19 @@
+using DeltaruneActs.TP;
+using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
+using MegaCrit.Sts2.Core.Entities.Creatures;
+using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 
 namespace DeltaruneActs.Cards;
 
-[Pool(typeof(BasicCardPool))]
-public partial class DualHeal : DeltaruneActsCard
+public sealed class DualHeal : DeltaruneActsCard
 {
-    public override CardId Id => DeltaruneActsCardIds.DualHeal;
-    public override TargetType TargetType => TargetType.AllAllies;
-    public override int BaseCost => 50;
-    public override CardType CardType => CardType.Skill;
+    public DualHeal() : base(0, CardType.Skill, CardRarity.Rare, TargetType.AllAllies) { }
 
-    public override void OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)
+    protected override async Task OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)
     {
-        SpendTp(choiceContext, BaseCost);
-        HealAllAllies(choiceContext, 18);
+        if (!TPManager.Spend(50)) return;
+        foreach (var ally in choiceContext.CombatState.Players)
+            if (!ally.IsDead) await CreatureCmd.Heal(ally, 18);
     }
 }

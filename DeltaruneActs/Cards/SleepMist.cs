@@ -1,18 +1,18 @@
+using DeltaruneActs.TP;
 using MegaCrit.Sts2.Core.Entities.Cards;
+using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 
 namespace DeltaruneActs.Cards;
 
-[Pool(typeof(BasicCardPool))]
-public partial class SleepMist : DeltaruneActsCard
+public sealed class SleepMist : DeltaruneActsCard
 {
-    public override CardId Id => DeltaruneActsCardIds.SleepMist;
-    public override TargetType TargetType => TargetType.AllEnemies;
-    public override int BaseCost => 32;
-    public override CardType CardType => CardType.Skill;
+    public SleepMist() : base(0, CardType.Skill, CardRarity.Rare, TargetType.AllEnemies) { }
 
-    public override void OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)
+    protected override Task OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)
     {
-        SpendTp(choiceContext, BaseCost);
-        MarkAllEnemiesTired(choiceContext, 25);
+        if (!TPManager.Spend(32)) return Task.CompletedTask;
+        foreach (var enemy in choiceContext.CombatState.Enemies)
+            ActResolver.AddSpareProgress(enemy, 25);
+        return Task.CompletedTask;
     }
 }

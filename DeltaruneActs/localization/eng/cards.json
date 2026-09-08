@@ -1,0 +1,14 @@
+{
+  "Check.title": "Check",
+  "Check.description": "Spend 10 TP. Gain 10 Spare progress against an enemy. Gain 2 Block.",
+  "Compliment.title": "Compliment",
+  "Compliment.description": "Spend 20 TP. Gain 20 Spare progress against an enemy. Gain 5 Block.",
+  "Warn.title": "Warn",
+  "Warn.description": "Spend 20 TP. Gain 15 Spare progress against an enemy. Apply 1 Weak.",
+  "Joke.title": "Joke",
+  "Joke.description": "Spend 15 TP. Gain 10 Spare progress against an enemy. Gain 5 Block and 5 TP.",
+  "Flirt.title": "Flirt",
+  "Flirt.description": "Spend 30 TP. Gain 30 Spare progress against an enemy. Gain 8 Block.",
+  "Spare.title": "Spare",
+  "Spare.description": "Spend 50 TP. If this enemy has enough Spare progress, remove it from combat. Otherwise, gain 10 Block."
+}

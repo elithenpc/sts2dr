@@ -10,5 +10,9 @@
   "Flirt.title": "Flirt",
   "Flirt.description": "Spend 30 TP. Gain 30 Spare progress against an enemy. Gain 8 Block.",
   "Spare.title": "Spare",
-  "Spare.description": "Spend 50 TP. If this enemy has enough Spare progress, remove it from combat. Otherwise, gain 10 Block."
+  "Spare.description": "Spend 50 TP. If this enemy has enough Spare progress, remove it from combat. Otherwise, gain 10 Block.",
+  "HealPrayer.title": "Heal Prayer",
+  "HealPrayer.description": "Spend 32 TP. Heal an ally for 12 HP.",
+  "RudeBuster.title": "Rude Buster",
+  "RudeBuster.description": "Spend 50 TP. Deal 18 damage to an enemy."
 }

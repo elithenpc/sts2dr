@@ -1,20 +1,17 @@
+using DeltaruneActs.TP;
+using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
+using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 
 namespace DeltaruneActs.Cards;
 
-[Pool(typeof(BasicCardPool))]
-public partial class SnowGrave : DeltaruneActsCard
+public sealed class SnowGrave : DeltaruneActsCard
 {
-    public override CardId Id => DeltaruneActsCardIds.SnowGrave;
-    public override TargetType TargetType => TargetType.AnyEnemy;
-    public override int BaseCost => 100;
-    public override CardType CardType => CardType.Skill;
+    public SnowGrave() : base(0, CardType.Skill, CardRarity.Rare, TargetType.AnyEnemy) { }
 
-    public override void OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)
+    protected override async Task OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)
     {
-        var target = cardPlay.Target as Creature;
-        if (target == null) return;
-        SpendTp(choiceContext, BaseCost);
-        DamageTarget(choiceContext, target, 60);
+        if (cardPlay.Target is null || cardPlay.Target.IsDead || !TPManager.Spend(100)) return;
+        await DamageCmd.Attack(60).FromCard(this, cardPlay).Targeting(cardPlay.Target).Execute(choiceContext);
     }
 }

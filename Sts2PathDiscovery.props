@@ -1,0 +1,8 @@
+<Project>
+  <PropertyGroup>
+    <Sts2Path Condition="'$(Sts2Path)' == '' and '$(OS)' == 'Windows_NT'">$(ProgramFiles(x86))\Steam\steamapps\common\Slay the Spire 2</Sts2Path>
+    <Sts2Path Condition="'$(Sts2Path)' == '' and '$(OS)' != 'Windows_NT'">$(HOME)/.steam/steam/steamapps/common/Slay the Spire 2</Sts2Path>
+    <Sts2DataDir Condition="'$(Sts2DataDir)' == ''">$(Sts2Path)/data_sts2_windows_x86_64</Sts2DataDir>
+    <ModsPath Condition="'$(ModsPath)' == ''">$(Sts2DataDir)/mods/</ModsPath>
+  </PropertyGroup>
+</Project>

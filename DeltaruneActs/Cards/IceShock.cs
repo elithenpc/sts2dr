@@ -1,22 +1,17 @@
-using Godot;
+using DeltaruneActs.TP;
+using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
-using MegaCrit.Sts2.Core.Models;
+using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 
 namespace DeltaruneActs.Cards;
 
-[Pool(typeof(BasicCardPool))]
-public partial class IceShock : DeltaruneActsCard
+public sealed class IceShock : DeltaruneActsCard
 {
-    public override CardId Id => DeltaruneActsCardIds.IceShock;
-    public override TargetType TargetType => TargetType.AnyEnemy;
-    public override int BaseCost => 16;
-    public override CardType CardType => CardType.Skill;
+    public IceShock() : base(0, CardType.Skill, CardRarity.Rare, TargetType.AnyEnemy) { }
 
-    public override void OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)
+    protected override async Task OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)
     {
-        var target = cardPlay.Target as Creature;
-        if (target == null) return;
-        SpendTp(choiceContext, BaseCost);
-        DamageTarget(choiceContext, target, 16);
+        if (cardPlay.Target is null || cardPlay.Target.IsDead || !TPManager.Spend(16)) return;
+        await DamageCmd.Attack(16).FromCard(this, cardPlay).Targeting(cardPlay.Target).Execute(choiceContext);
     }
 }

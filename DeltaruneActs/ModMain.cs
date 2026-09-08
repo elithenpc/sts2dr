@@ -27,7 +27,9 @@ public partial class ModMain : Node
         ModelDb.Inject(typeof(Cards.Joke));
         ModelDb.Inject(typeof(Cards.Flirt));
         ModelDb.Inject(typeof(Cards.Spare));
+        ModelDb.Inject(typeof(Cards.HealPrayer));
+        ModelDb.Inject(typeof(Cards.RudeBuster));
 
-        Logger.Info("Deltarune Acts loaded: ACT + TP system online.");
+        Logger.Info("Deltarune Acts loaded: ACT + TP + spell system online.");
     }
 }

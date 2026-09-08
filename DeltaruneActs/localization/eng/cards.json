@@ -14,5 +14,9 @@
   "HealPrayer.title": "Heal Prayer",
   "HealPrayer.description": "Spend 32 TP. Heal an ally for 12 HP.",
   "RudeBuster.title": "Rude Buster",
-  "RudeBuster.description": "Spend 50 TP. Deal 18 damage to an enemy."
+  "RudeBuster.description": "Spend 50 TP. Deal 18 damage to an enemy.",
+  "Pacify.title": "Pacify",
+  "Pacify.description": "Spend 16 TP. Gain 40 Spare progress against an enemy. Gain 3 Block.",
+  "RedBuster.title": "Red Buster",
+  "RedBuster.description": "Spend 60 TP. Deal 28 damage to an enemy."
 }

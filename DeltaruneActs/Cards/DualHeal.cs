@@ -1,7 +1,6 @@
 using DeltaruneActs.TP;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
-using MegaCrit.Sts2.Core.Entities.Creatures;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 
 namespace DeltaruneActs.Cards;
@@ -13,7 +12,7 @@ public sealed class DualHeal : DeltaruneActsCard
     protected override async Task OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)
     {
         if (!TPManager.Spend(50)) return;
-        foreach (var ally in choiceContext.CombatState.Players)
+        foreach (var ally in CombatState.Players)
             if (!ally.IsDead) await CreatureCmd.Heal(ally, 18);
     }
 }

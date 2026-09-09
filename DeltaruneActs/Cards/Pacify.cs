@@ -3,6 +3,7 @@ using DeltaruneActs.TP;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
+using MegaCrit.Sts2.Core.ValueProps;
 
 namespace DeltaruneActs.Cards;
 
@@ -17,6 +18,6 @@ public sealed class Pacify : DeltaruneActsCard
             return;
 
         ActResolver.AddProgress(target, 40);
-        await BlockCmd.Gain(3, this);
+        await CreatureCmd.GainBlock(Owner.Creature, 3, ValueProp.Move, cardPlay);
     }
 }

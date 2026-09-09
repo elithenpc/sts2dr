@@ -1,6 +1,5 @@
 using BaseLib.Abstracts;
 using BaseLib.Extensions;
-using BaseLib.Utils;
 using MegaCrit.Sts2.Core.Entities.Cards;
 
 namespace DeltaruneActs.Cards;
@@ -8,7 +7,9 @@ namespace DeltaruneActs.Cards;
 public abstract class DeltaruneActsCard(int cost, CardType type, CardRarity rarity, TargetType target)
     : CustomCardModel(cost, type, rarity, target)
 {
-    public override string CustomPortraitPath => $"{Id.Entry.RemovePrefix().ToLowerInvariant()}.png".BigCardImagePath();
-    public override string PortraitPath => $"{Id.Entry.RemovePrefix().ToLowerInvariant()}.png".CardImagePath();
-    public override string BetaPortraitPath => $"beta/{Id.Entry.RemovePrefix().ToLowerInvariant()}.png".CardImagePath();
+    private static string CardName(string entry) => entry.RemovePrefix().ToLowerInvariant();
+
+    public override string CustomPortraitPath => $"res://DeltaruneActs/images/card_portraits/big/{CardName(Id.Entry)}.png";
+    public override string PortraitPath => $"res://DeltaruneActs/images/card_portraits/{CardName(Id.Entry)}.png";
+    public override string BetaPortraitPath => PortraitPath;
 }

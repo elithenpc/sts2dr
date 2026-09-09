@@ -1,5 +1,6 @@
 <Project Sdk="Godot.NET.Sdk/4.5.1" InitialTargets="CheckDependencyPaths">
   <Import Project=".\Sts2PathDiscovery.props" />
+
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
     <ImplicitUsings>true</ImplicitUsings>
@@ -11,37 +12,62 @@
     <GodotDisabledSourceGenerators>GodotPluginsInitializer</GodotDisabledSourceGenerators>
     <NoWarn>$(NoWarn);MSB3270</NoWarn>
   </PropertyGroup>
+
   <ItemGroup Condition="Exists('$(Sts2DataDir)')">
-    <Reference Include="0Harmony"><HintPath>$(Sts2DataDir)/0Harmony.dll</HintPath><Private>false</Private></Reference>
-    <Reference Include="sts2"><HintPath>$(Sts2DataDir)/sts2.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="0Harmony">
+      <HintPath>$(Sts2DataDir)/0Harmony.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="sts2">
+      <HintPath>$(Sts2DataDir)/sts2.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
   </ItemGroup>
+
   <ItemGroup Condition="$(Publicize)">
     <PackageReference Include="Krafs.Publicizer" Version="2.3.0" PrivateAssets="All" />
     <Publicize Include="sts2" IncludeVirtualMembers="false" IncludeCompilerGeneratedMembers="false" />
   </ItemGroup>
+
   <ItemGroup>
     <PackageReference Include="Alchyr.Sts2.BaseLib" Version="*" PrivateAssets="All" />
     <PackageReference Include="Alchyr.Sts2.ModAnalyzers" Version="*" />
     <AdditionalFiles Include="DeltaruneActs/localization/**/*.json" />
   </ItemGroup>
+
   <ItemGroup>
-    <Compile Remove="DeltaruneActs/images/**" />
-    <Compile Remove="DeltaruneActs/materials/**" />
-    <Compile Remove="DeltaruneActs/shaders/**" />
-    <EmbeddedResource Remove="DeltaruneActs/images/**" />
-    <EmbeddedResource Remove="DeltaruneActs/materials/**" />
-    <EmbeddedResource Remove="DeltaruneActs/shaders/**" />
-  </ItemGroup>
-  <ItemGroup>
+    <Compile Remove="DeltaruneActs/**" />
+    <Compile Include="DeltaruneActs/**/*.cs" />
+    <EmbeddedResource Remove="DeltaruneActs/**" />
+    <None Include="DeltaruneActs/**" />
     <None Include="DeltaruneActs.json" />
     <None Include="project.godot" />
-    <None Include="DeltaruneActs/**" />
   </ItemGroup>
+
   <Target Name="CheckDependencyPaths">
-    <Error Text="Slay the Spire 2 data not found at '$(Sts2DataDir)'. Install the game or set Sts2Path." Condition="'$(Sts2DataDir)' == '' or !Exists('$(Sts2DataDir)')" />
+    <Error
+      Text="Slay the Spire 2 data not found at '$(Sts2DataDir)'. Install the game or set Sts2Path."
+      Condition="'$(Sts2DataDir)' == '' or !Exists('$(Sts2DataDir)')" />
   </Target>
+
+  <Target Name="UpdateDependencyVersions" BeforeTargets="BeforeBuild" Condition="Exists('.godot/mono/temp/obj/project.assets.json')">
+    <PropertyGroup>
+      <ManifestPath>$(MSBuildProjectName).json</ManifestPath>
+      <NuGetData>$([System.IO.File]::ReadAllText('.godot/mono/temp/obj/project.assets.json'))</NuGetData>
+      <ActiveBaseLibVersion>$([System.Text.RegularExpressions.Regex]::Match($(NuGetData), '"Alchyr.Sts2.BaseLib\/([^"]*)').Result('$1'))</ActiveBaseLibVersion>
+      <OldContent>$([System.IO.File]::ReadAllText($(ManifestPath)))</OldContent>
+      <NewContent>$([System.Text.RegularExpressions.Regex]::Replace($(OldContent), '("id":\s*"BaseLib",\s*"min_version":\s*")[^"]*', '${1}$(ActiveBaseLibVersion)'))</NewContent>
+    </PropertyGroup>
+    <WriteLinesToFile
+      Condition="'$(OldContent)' != '$(NewContent)'"
+      File="$(ManifestPath)"
+      Lines="$(NewContent)"
+      Overwrite="true"
+      Encoding="UTF-8" />
+  </Target>
+
   <Target Name="CopyToModsFolderOnBuild" AfterTargets="PostBuildEvent">
-    <Message Text="Copying .dll .pdb and .json to mods folder." Importance="high" />
+    <Message Text="Copying Deltarune Acts to the Slay the Spire 2 mods folder." Importance="high" />
     <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(ModsPath)$(MSBuildProjectName)/" />
     <Copy SourceFiles="$(AssemblyName).json" DestinationFolder="$(ModsPath)$(MSBuildProjectName)/" />
     <Copy SourceFiles="$(TargetDir)$(TargetName).pdb" DestinationFolder="$(ModsPath)$(MSBuildProjectName)/" />

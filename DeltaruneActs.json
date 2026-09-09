@@ -2,10 +2,10 @@
   "id": "DeltaruneActs",
   "name": "Deltarune Acts",
   "author": "elithenpc",
-  "description": "A Slay the Spire 2 content mod inspired by Deltarune's ACT and TP systems.",
+  "description": "A Slay the Spire 2 content mod inspired by Deltarune's ACT, TP, and spell systems.",
   "version": "0.1.0",
   "min_game_version": "0.107.0",
-  "has_pck": false,
+  "has_pck": true,
   "has_dll": true,
   "dependencies": [
     { "id": "BaseLib", "min_version": "3.3.0" }

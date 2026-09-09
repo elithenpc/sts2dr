@@ -3,6 +3,7 @@ using DeltaruneActs.TP;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
+using MegaCrit.Sts2.Core.ValueProps;
 
 namespace DeltaruneActs.Cards;
 
@@ -16,6 +17,6 @@ public sealed class Flirt : DeltaruneActsCard
             return;
 
         ActResolver.AddProgress(target, 30);
-        await BlockCmd.Gain(8, this);
+        await CreatureCmd.GainBlock(Owner.Creature, 8, ValueProp.Move, cardPlay);
     }
 }

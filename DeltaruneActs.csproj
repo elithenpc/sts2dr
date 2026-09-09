@@ -11,7 +11,10 @@
     <PathMap>$(AppOutputBase)=.\</PathMap>
     <GodotDisabledSourceGenerators>GodotPluginsInitializer</GodotDisabledSourceGenerators>
     <NoWarn>$(NoWarn);MSB3270</NoWarn>
-    <GodotPath Condition="'$(GodotPath)' == ''">$(GodotExe)</GodotPath>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(GodotPath)' == '' and '$(GodotExe)' != ''">
+    <GodotPath>$(GodotExe)</GodotPath>
   </PropertyGroup>
 
   <ItemGroup Condition="Exists('$(Sts2DataDir)')">

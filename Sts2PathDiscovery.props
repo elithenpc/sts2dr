@@ -31,4 +31,6 @@
     <ModsPath>$(Sts2Path)/SlayTheSpire2.app/Contents/MacOS/mods/</ModsPath>
     <Sts2DataDir>$(Sts2Path)/SlayTheSpire2.app/Contents/Resources/data_sts2_macos_x86_64</Sts2DataDir>
   </PropertyGroup>
+
+  <Import Project="local.props" Condition="Exists('local.props')" />
 </Project>

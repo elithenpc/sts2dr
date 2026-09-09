@@ -3,6 +3,7 @@ using DeltaruneActs.TP;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
+using MegaCrit.Sts2.Core.ValueProps;
 
 namespace DeltaruneActs.Cards;
 
@@ -16,6 +17,6 @@ public sealed class Check : DeltaruneActsCard
             return;
 
         ActResolver.AddProgress(target, 10);
-        await BlockCmd.Gain(2, this);
+        await CreatureCmd.GainBlock(Owner.Creature, 2, ValueProp.Move, cardPlay);
     }
 }

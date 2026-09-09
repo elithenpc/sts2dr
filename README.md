@@ -68,18 +68,34 @@ Requirements:
 
 - Slay the Spire 2 installed through Steam.
 - .NET 9 SDK.
-- Godot/MegaDot 4.5.1 Mono if you want to use the Godot project tooling.
+- MegaDot/Godot 4.5.1 Mono for exporting the resource `.pck`.
 - BaseLib is pulled through NuGet and is also required by the mod manifest.
 
-From the repository directory, run:
+For a normal code build:
 
 ```powershell
 dotnet build
 ```
 
-The build copies the DLL, PDB, and manifest into the game's `mods/DeltaruneActs/` directory automatically when the Slay the Spire 2 installation is detected. The path discovery follows the current ModTemplate-StS2/BaseLib approach and also supports an explicit `Sts2Path` override.
+For a complete mod package including the card images, make a local build settings file first:
 
-If the game does not detect the mod, make sure BaseLib is installed in the game's `mods` directory first.
+```powershell
+Copy-Item local.props.template local.props
+```
+
+Then edit `local.props` and set `GodotPath` to your MegaDot/Godot 4.5.1 Mono executable. The current STS2 modding setup uses Godot/MegaDot 4.5.1 for `.pck` export. citeturn3search8turn3search6
+
+Then run:
+
+```powershell
+dotnet publish
+```
+
+Publishing exports `DeltaruneActs.pck` and copies the DLL, PDB, manifest, and PCK into the detected `mods/DeltaruneActs/` directory. STS2 modding templates use the same publish-to-PCK workflow for resource assets. citeturn2search0turn2search6
+
+If Slay the Spire 2 is installed in a non-standard Steam library, set `Sts2Path` in `local.props`. BaseLib's current path-discovery setup likewise supports a local path override. citeturn3search4
+
+BaseLib must be installed in the game's `mods` directory before loading this mod.
 
 ## Development status
 
@@ -87,4 +103,4 @@ The main ACT, TP, spell, portrait, and combat UI systems are implemented. Enemy-
 
 ## Compatibility
 
-The project follows the current `Alchyr/ModTemplate-StS2` content-mod structure and targets .NET 9 / Godot 4.5.1. Slay the Spire 2 is in Early Access, so game updates can require corresponding mod updates.
+The project follows the current `Alchyr/ModTemplate-StS2` content-mod structure and targets .NET 9 / Godot 4.5.1. Slay the Spire 2 is in Early Access, so game updates can require corresponding mod updates. The game is actively receiving updates, so the mod's compiled API compatibility should be checked after major game updates. citeturn1search1turn1search6

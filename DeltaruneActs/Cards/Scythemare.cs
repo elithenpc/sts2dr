@@ -1,5 +1,6 @@
-using DeltaruneActs.TP;
+using BaseLib.Extensions;
 using DeltaruneActs.ACT;
+using DeltaruneActs.TP;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 
@@ -12,8 +13,10 @@ public sealed class Scythemare : DeltaruneActsCard
     protected override Task OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)
     {
         if (!TPManager.Spend(40)) return Task.CompletedTask;
-        foreach (var enemy in CombatState.Enemies)
+
+        foreach (var enemy in cardPlay.Card.GetTargets())
             ActResolver.AddProgress(enemy, 100);
+
         return Task.CompletedTask;
     }
 }

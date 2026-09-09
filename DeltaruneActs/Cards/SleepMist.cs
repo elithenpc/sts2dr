@@ -1,3 +1,4 @@
+using DeltaruneActs.ACT;
 using DeltaruneActs.TP;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
@@ -11,8 +12,8 @@ public sealed class SleepMist : DeltaruneActsCard
     protected override Task OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)
     {
         if (!TPManager.Spend(32)) return Task.CompletedTask;
-        foreach (var enemy in choiceContext.CombatState.Enemies)
-            ActResolver.AddSpareProgress(enemy, 25);
+        foreach (var enemy in CombatState.Enemies)
+            ActResolver.AddProgress(enemy, 25);
         return Task.CompletedTask;
     }
 }

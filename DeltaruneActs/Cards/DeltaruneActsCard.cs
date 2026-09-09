@@ -1,9 +1,11 @@
 using BaseLib.Abstracts;
 using BaseLib.Extensions;
 using MegaCrit.Sts2.Core.Entities.Cards;
+using MegaCrit.Sts2.Core.Models.CardPools;
 
 namespace DeltaruneActs.Cards;
 
+[Pool(typeof(ColorlessCardPool))]
 public abstract class DeltaruneActsCard(int cost, CardType type, CardRarity rarity, TargetType target)
     : CustomCardModel(cost, type, rarity, target)
 {

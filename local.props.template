@@ -1,0 +1,10 @@
+<Project>
+  <PropertyGroup>
+    <!-- Optional: set this if Slay the Spire 2 is not found automatically. -->
+    <!-- <Sts2Path>C:\Program Files (x86)\Steam\steamapps\common\Slay the Spire 2</Sts2Path> -->
+
+    <!-- Required only for `dotnet publish`, which creates the resource .pck. -->
+    <!-- Use MegaDot/Godot 4.5.1 Mono. -->
+    <GodotPath>C:\Path\To\MegaDot_v4.5.1-stable_mono_win64.exe</GodotPath>
+  </PropertyGroup>
+</Project>

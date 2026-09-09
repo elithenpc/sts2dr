@@ -12,8 +12,8 @@ public sealed class Scythemare : DeltaruneActsCard
     protected override Task OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)
     {
         if (!TPManager.Spend(40)) return Task.CompletedTask;
-        foreach (var enemy in choiceContext.CombatState.Enemies)
-            ActResolver.AddSpareProgress(enemy, 100);
+        foreach (var enemy in CombatState.Enemies)
+            ActResolver.AddProgress(enemy, 100);
         return Task.CompletedTask;
     }
 }

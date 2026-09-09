@@ -42,6 +42,7 @@
     <None Include="DeltaruneActs/**" />
     <None Include="DeltaruneActs.json" />
     <None Include="project.godot" />
+    <Content Include="Sts2PathDiscovery.props" />
   </ItemGroup>
 
   <Target Name="CheckDependencyPaths">
@@ -71,5 +72,19 @@
     <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(ModsPath)$(MSBuildProjectName)/" />
     <Copy SourceFiles="$(AssemblyName).json" DestinationFolder="$(ModsPath)$(MSBuildProjectName)/" />
     <Copy SourceFiles="$(TargetDir)$(TargetName).pdb" DestinationFolder="$(ModsPath)$(MSBuildProjectName)/" />
+  </Target>
+
+  <Target Name="NeedGodotForPublish" BeforeTargets="Publish">
+    <Error
+      Text="Godot/MegaDot path must be configured before publishing the .pck. Set GodotPath in Directory.Build.props or use the game's Godot/MegaDot 4.5.1 executable."
+      Condition="'$(GodotPath)' == '' or !Exists('$(GodotPath)')" />
+  </Target>
+
+  <Target Name="GodotPublish" AfterTargets="Publish" Condition="'$(GodotPath)' != '' and Exists('$(GodotPath)') and '$(IsInnerGodotExport)' != 'true'">
+    <Message Text="Exporting Deltarune Acts resources to a .pck." Importance="high" />
+    <Exec
+      Command="&quot;$(GodotPath)&quot; --headless --export-pack &quot;BasicExport&quot; &quot;$(ModsPath)$(MSBuildProjectName)/$(MSBuildProjectName).pck&quot;"
+      EnvironmentVariables="IsInnerGodotExport=true;MSBUILDDISABLENODEREUSE=1"
+      ContinueOnError="WarnAndContinue" />
   </Target>
 </Project>

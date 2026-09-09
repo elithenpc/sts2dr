@@ -24,6 +24,7 @@ A Slay the Spire 2 content mod inspired by Deltarune's ACT, TP, and spell system
 - Attacks generate 5 TP, skills 3 TP, and powers 2 TP.
 - ACT cards and Deltarune spell cards spend TP rather than Energy.
 - TP is capped at 100.
+- An in-combat `TP: current / 100` display is shown in the combat UI.
 
 ### Deltarune-inspired spells
 
@@ -82,7 +83,7 @@ If the game does not detect the mod, make sure BaseLib is installed in the game'
 
 ## Development status
 
-The repository is a playable content-mod implementation, but it should be treated as a work in progress. The TP resource currently exists as backend state and is not yet rendered as a dedicated on-screen TP meter. Enemy-specific ACT reactions are also not yet specialised per enemy.
+The main ACT, TP, spell, portrait, and combat UI systems are implemented. Enemy-specific ACT reactions are still generic rather than specialised per enemy, and the card art is currently source-sprite based rather than a finished custom card-art pass.
 
 ## Compatibility
 

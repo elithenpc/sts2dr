@@ -3,6 +3,7 @@ using DeltaruneActs.TP;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
+using MegaCrit.Sts2.Core.ValueProps;
 
 namespace DeltaruneActs.Cards;
 
@@ -17,7 +18,7 @@ public sealed class Spare : DeltaruneActsCard
 
         if (!ActResolver.CanSpare(target))
         {
-            await BlockCmd.Gain(10, this);
+            await CreatureCmd.GainBlock(Owner.Creature, 10, ValueProp.Move, cardPlay);
             return;
         }
 

@@ -1,5 +1,6 @@
 using System.Reflection;
 using HarmonyLib;
+using DeltaruneActs.ACT;
 using DeltaruneActs.Cards;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Hooks;
@@ -48,5 +49,9 @@ public static class TPHooks
         }
     }
 
-    private static void BeforeCombatStart() => TPManager.Reset();
+    private static void BeforeCombatStart()
+    {
+        TPManager.Reset();
+        ActResolver.Reset();
+    }
 }

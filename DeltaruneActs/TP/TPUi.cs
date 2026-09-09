@@ -46,7 +46,7 @@ internal static class TPCombatUiExitTreePatch
     }
 }
 
-internal sealed class TPDisplay : PanelContainer
+internal sealed partial class TPDisplay : PanelContainer
 {
     private readonly Label _label;
 

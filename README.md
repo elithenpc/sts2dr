@@ -83,7 +83,7 @@ For a complete mod package including the card images, make a local build setting
 Copy-Item local.props.template local.props
 ```
 
-Then edit `local.props` and set `GodotPath` to your MegaDot/Godot 4.5.1 Mono executable. The current STS2 modding setup uses Godot/MegaDot 4.5.1 for `.pck` export. citeturn3search8turn3search6
+Then edit `local.props` and set `GodotPath` to your MegaDot/Godot 4.5.1 Mono executable.
 
 Then run:
 
@@ -91,9 +91,9 @@ Then run:
 dotnet publish
 ```
 
-Publishing exports `DeltaruneActs.pck` and copies the DLL, PDB, manifest, and PCK into the detected `mods/DeltaruneActs/` directory. STS2 modding templates use the same publish-to-PCK workflow for resource assets. citeturn2search0turn2search6
+Publishing exports `DeltaruneActs.pck` and copies the DLL, PDB, manifest, and PCK into the detected `mods/DeltaruneActs/` directory.
 
-If Slay the Spire 2 is installed in a non-standard Steam library, set `Sts2Path` in `local.props`. BaseLib's current path-discovery setup likewise supports a local path override. citeturn3search4
+If Slay the Spire 2 is installed in a non-standard Steam library, set `Sts2Path` in `local.props`.
 
 BaseLib must be installed in the game's `mods` directory before loading this mod.
 
@@ -103,4 +103,4 @@ The main ACT, TP, spell, portrait, and combat UI systems are implemented. Enemy-
 
 ## Compatibility
 
-The project follows the current `Alchyr/ModTemplate-StS2` content-mod structure and targets .NET 9 / Godot 4.5.1. Slay the Spire 2 is in Early Access, so game updates can require corresponding mod updates. The game is actively receiving updates, so the mod's compiled API compatibility should be checked after major game updates. citeturn1search1turn1search6
+The project follows the current `Alchyr/ModTemplate-StS2` content-mod structure and targets .NET 9 / Godot 4.5.1. Slay the Spire 2 is in Early Access, so game updates can require corresponding mod updates.

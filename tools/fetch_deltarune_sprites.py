@@ -1,14 +1,8 @@
 #!/usr/bin/env python3
-"""Fetch the real Deltarune battle-sprite animations used by the card art.
-
-The sprite files themselves are not bundled by this script's source code. They are
-retrieved from their original Deltarune Wiki file pages into the local mod build
-folder. The GitHub Actions workflow uses this script to prepare local build assets.
-"""
+"""Fetch the real Deltarune battle-sprite animations used by the card art."""
 from __future__ import annotations
 
 import json
-import os
 import subprocess
 import sys
 import urllib.parse
@@ -19,9 +13,6 @@ API = "https://deltarune.wiki/api.php"
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "DeltaruneActs" / "images" / "card_portraits"
 
-# Each target maps to the most specific file-search phrases first.  The wiki's
-# MediaWiki API resolves the current canonical filename, so the repo does not
-# depend on a hard-coded image URL changing.
 SOURCES = {
     "kris_check.png": ["Kris battle act", "Kris ACT battle"],
     "kris_compliment.png": ["Kris battle act", "Kris ACT battle"],
@@ -32,7 +23,7 @@ SOURCES = {
     "ralsei_heal.png": ["Ralsei battle spell", "Ralsei battle spell action"],
     "susie_rudebuster.png": ["Susie Rude Buster", "Susie battle Rude Buster", "Susie battle spell"],
     "susie_redbuster.png": ["Susie RedBuster", "Susie battle Rude Buster", "Susie battle spell"],
-    "dual.png": ["Ralsei battle spell", "Susie battle Rude Buster"],
+    "dual.png": ["Ralsei battle spell", "Susie Rude Buster"],
 }
 
 
@@ -54,7 +45,6 @@ def search_file(phrase: str) -> tuple[str, str] | None:
     if not hits:
         return None
 
-    # Prefer titles that contain the important action/character keywords.
     wanted = [w.lower() for w in phrase.split()]
     ranked: list[tuple[int, str]] = []
     for hit in hits:
@@ -81,27 +71,27 @@ def search_file(phrase: str) -> tuple[str, str] | None:
 
 
 def download(url: str, destination: Path) -> None:
-    request = urllib.request.Request(
-        url,
-        headers={"User-Agent": "sts2dr-sprite-fetcher/1.0"},
-    )
+    request = urllib.request.Request(url, headers={"User-Agent": "sts2dr-sprite-fetcher/1.0"})
     with urllib.request.urlopen(request, timeout=60) as response:
         destination.write_bytes(response.read())
 
 
 def convert_first_frame(source: Path, destination: Path) -> None:
-    # ImageMagick is used only by the local build/workflow environment so the
-    # card portrait is a regular PNG that Godot can import reliably.
+    """Convert an animated sprite's first frame to a normal PNG.
+
+    Ubuntu 24.04 ships ImageMagick 6, whose executable is `convert`, not the
+    ImageMagick 7 `magick` launcher used by the previous workflow.
+    """
     try:
         subprocess.run(
-            ["magick", f"{source}[0]", str(destination)],
+            ["convert", f"{source}[0]", "-strip", str(destination)],
             check=True,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             text=True,
         )
     except FileNotFoundError:
-        print("ImageMagick ('magick') is required to convert the sprite animation.", file=sys.stderr)
+        print("ImageMagick ('convert') is required to convert the sprite animation.", file=sys.stderr)
         raise SystemExit(2)
 
 

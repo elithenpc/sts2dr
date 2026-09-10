@@ -14,6 +14,7 @@ ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "DeltaruneActs" / "images" / "card_portraits"
 
 SOURCES = {
+    "tp_kris.png": ["Kris battle act"],
     "kris_check.png": ["Kris battle act", "Kris ACT battle"],
     "kris_compliment.png": ["Kris battle act", "Kris ACT battle"],
     "kris_social.png": ["Kris battle act", "Kris ACT battle"],

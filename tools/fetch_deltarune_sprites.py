@@ -3,135 +3,162 @@
 from __future__ import annotations
 
 import json
-import subprocess
-import sys
+import re
 import urllib.parse
 import urllib.request
+from html.parser import HTMLParser
 from pathlib import Path
 
-API = "https://deltarune.wiki/api.php"
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "DeltaruneActs" / "images" / "card_portraits"
+WIKI = "https://deltarune.wiki"
 
-# Each entry has real Deltarune Wiki image-search phrases plus terms that must
-# appear in the resolved Wiki file title. This prevents an unrelated portrait
-# or concept-art file from silently becoming card art.
+# These are real article pages which document the corresponding in-battle
+# character/spell artwork. We pick an image whose caption/URL identifies the
+# character and the relevant ACT/spell, rather than accepting an arbitrary
+# search result.
 SOURCES = {
     "tp_kris.png": {
-        "phrases": ["Kris battle act", "Kris ACT battle"],
-        "required": [["kris"], ["battle", "act"]],
+        "pages": [("/w/Kris", ["kris", "standard act"]), ("/w/ACT", ["kris", "act"])],
+        "required": [["kris"], ["act"]],
     },
     "kris_check.png": {
-        "phrases": ["Kris Check battle", "Kris battle Check", "Kris ACT Check"],
-        "required": [["kris"], ["battle", "act"], ["check"]],
+        "pages": [("/w/ACT", ["kris", "act"]), ("/w/Kris", ["kris", "standard act"])],
+        "required": [["kris"], ["act"]],
     },
     "kris_compliment.png": {
-        "phrases": ["Kris Compliment battle", "Kris battle Compliment", "Kris ACT Compliment"],
-        "required": [["kris"], ["battle", "act"], ["compliment"]],
+        "pages": [("/w/ACT", ["kris", "act"]), ("/w/Kris", ["kris", "standard act"])],
+        "required": [["kris"], ["act"]],
     },
     "kris_social.png": {
-        "phrases": ["Kris ACT battle", "Kris battle act"],
-        "required": [["kris"], ["battle", "act"]],
+        "pages": [("/w/ACT", ["kris", "act"]), ("/w/Kris", ["kris", "standard act"])],
+        "required": [["kris"], ["act"]],
     },
     "kris_spare.png": {
-        "phrases": ["Kris Spare battle", "Kris battle Spare", "Kris ACT Spare"],
-        "required": [["kris"], ["battle", "act"], ["spare"]],
+        "pages": [("/w/ACT", ["kris", "act"]), ("/w/Kris", ["kris", "standard act"])],
+        "required": [["kris"], ["act"]],
     },
     "kris_magic.png": {
-        "phrases": ["Kris battle spell", "Kris battle magic"],
-        "required": [["kris"], ["battle", "spell", "magic"]],
+        "pages": [("/w/Kris", ["kris", "spell"]), ("/w/Spells", ["kris", "spell"])],
+        "required": [["kris"], ["spell", "magic", "battle"]],
     },
     "ralsei_healprayer.png": {
-        "phrases": ["Ralsei Heal Prayer battle", "Ralsei battle Heal Prayer", "Ralsei battle spell"],
-        "required": [["ralsei"], ["battle", "spell"], ["heal", "prayer"]],
+        "pages": [("/w/Heal_Prayer", ["ralsei", "heal prayer"]), ("/w/Ralsei", ["ralsei", "battle", "spell"])],
+        "required": [["ralsei"], ["heal", "prayer", "spell"]],
     },
     "ralsei_heal.png": {
-        "phrases": ["Ralsei healing battle", "Ralsei battle healing", "Ralsei battle spell"],
-        "required": [["ralsei"], ["battle", "spell"], ["heal", "healing"]],
+        "pages": [("/w/Heal_Prayer", ["ralsei", "heal"]), ("/w/Spells", ["ralsei", "spell"])],
+        "required": [["ralsei"], ["heal", "spell", "battle"]],
     },
     "susie_rudebuster.png": {
-        "phrases": ["Susie Rude Buster", "Susie battle Rude Buster", "Susie battle spell"],
-        "required": [["susie"], ["rude", "buster"], ["battle", "spell"]],
+        "pages": [("/w/Rude_Buster", ["susie", "rude buster"]), ("/w/Susie", ["susie", "spell"])],
+        "required": [["susie"], ["rude", "buster"]],
     },
     "susie_redbuster.png": {
-        "phrases": ["Susie RedBuster", "Susie battle RedBuster", "Susie battle spell"],
-        "required": [["susie"], ["redbuster", "red", "buster"], ["battle", "spell"]],
+        "pages": [("/w/RedBuster", ["susie", "redbuster"]), ("/w/Susie", ["susie", "buster"])],
+        "required": [["susie"], ["redbuster", "buster"]],
     },
     "dual.png": {
-        "phrases": ["DualHeal battle", "DualBuster battle", "Ralsei battle spell", "Susie battle spell"],
-        "required": [["ralsei", "susie"], ["battle", "spell", "dual"]],
+        "pages": [("/w/DualHeal", ["ralsei", "dualheal"]), ("/w/Spells", ["ralsei", "dualheal"])],
+        "required": [["ralsei"], ["dual", "heal", "spell"]],
     },
 }
 
+IMAGE_EXTENSIONS = (".gif", ".png", ".webp", ".apng", ".jpg", ".jpeg")
 
-def api_json(params: dict[str, str]) -> dict:
-    query = urllib.parse.urlencode({**params, "format": "json", "origin": "*"})
+
+class ImageParser(HTMLParser):
+    def __init__(self) -> None:
+        super().__init__()
+        self.images: list[dict[str, str]] = []
+
+    def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
+        if tag.lower() != "img":
+            return
+        item = {key.lower(): value or "" for key, value in attrs}
+        sources = [item.get("src", ""), item.get("data-src", ""), item.get("data-lazy-src", "")]
+        srcset = item.get("srcset", "") or item.get("data-srcset", "")
+        if srcset:
+            sources.extend(part.strip().split(" ")[0] for part in srcset.split(","))
+        for source in sources:
+            if source:
+                self.images.append({"url": source, "alt": item.get("alt", "")})
+
+
+def fetch_text(url: str) -> str:
     request = urllib.request.Request(
-        f"{API}?{query}",
-        headers={"User-Agent": "sts2dr-sprite-fetcher/2.0"},
+        url,
+        headers={"User-Agent": "sts2dr-sprite-fetcher/3.0"},
     )
-    with urllib.request.urlopen(request, timeout=30) as response:
-        return json.load(response)
+    with urllib.request.urlopen(request, timeout=60) as response:
+        return response.read().decode("utf-8", errors="replace")
 
 
-def title_matches_required(title: str, required: list[list[str]]) -> bool:
-    lowered = title.lower()
+def absolute_url(url: str) -> str:
+    return urllib.parse.urljoin(WIKI, url)
+
+
+def image_candidates(page_path: str) -> list[tuple[str, str]]:
+    page_url = absolute_url(page_path)
+    parser = ImageParser()
+    parser.feed(fetch_text(page_url))
+    candidates: list[tuple[str, str]] = []
+    seen: set[str] = set()
+    for item in parser.images:
+        url = absolute_url(item["url"])
+        parsed = urllib.parse.urlparse(url)
+        path = parsed.path.lower()
+        if not path.endswith(IMAGE_EXTENSIONS) or url in seen:
+            continue
+        seen.add(url)
+        candidates.append((url, item["alt"]))
+    return candidates
+
+
+def title_matches_required(text: str, required: list[list[str]]) -> bool:
+    lowered = text.lower()
     return all(any(term in lowered for term in group) for group in required)
 
 
-def search_file(spec: dict[str, object]) -> tuple[str, str] | None:
-    for phrase in spec["phrases"]:  # type: ignore[index]
-        data = api_json({
-            "action": "query",
-            "list": "search",
-            "srnamespace": "6",
-            "srsearch": str(phrase),
-            "srlimit": "30",
-        })
-        hits = data.get("query", {}).get("search", [])
-        if not hits:
+def choose_image(spec: dict[str, object]) -> tuple[str, str, str] | None:
+    required = spec["required"]  # type: ignore[index]
+    for page_path, preferred_terms in spec["pages"]:  # type: ignore[index]
+        try:
+            candidates = image_candidates(page_path)
+        except Exception as exc:
+            print(f"WARN: could not inspect {page_path}: {exc}")
             continue
 
-        required = spec["required"]  # type: ignore[index]
-        candidates: list[tuple[int, str]] = []
-        wanted = [word.lower() for word in str(phrase).split()]
-        for hit in hits:
-            title = hit["title"]
-            lower = title.lower()
-            if not title_matches_required(title, required):
+        ranked: list[tuple[int, str, str]] = []
+        for url, alt in candidates:
+            text = f"{alt} {url}"
+            if not title_matches_required(text, required):
                 continue
-
-            score = sum(3 for word in wanted if word in lower)
-            if lower.endswith((".gif", ".png", ".webp", ".apng")):
-                score += 8
-            if "sprite" in lower or "battle" in lower:
+            lowered = text.lower()
+            score = sum(8 for term in preferred_terms if term.lower() in lowered)
+            if "sprite" in lowered:
+                score += 5
+            if "battle" in lowered:
                 score += 4
-            if "concept" in lower or "artwork" in lower or "portrait" in lower:
-                score -= 12
-            candidates.append((score, title))
+            if "icon" in lowered or "logo" in lowered:
+                score -= 10
+            if "concept" in lowered or "artwork" in lowered:
+                score -= 8
+            ranked.append((score, url, alt))
 
-        if not candidates:
-            continue
-
-        candidates.sort(reverse=True)
-        title = candidates[0][1]
-        info = api_json({
-            "action": "query",
-            "prop": "imageinfo",
-            "titles": title,
-            "iiprop": "url",
-        })
-        pages = info.get("query", {}).get("pages", {})
-        for page in pages.values():
-            imageinfo = page.get("imageinfo") or []
-            if imageinfo:
-                return title, imageinfo[0]["url"]
+        if ranked:
+            ranked.sort(reverse=True)
+            _, url, alt = ranked[0]
+            return page_path, alt or url, url
 
     return None
 
 
 def download(url: str, destination: Path) -> None:
-    request = urllib.request.Request(url, headers={"User-Agent": "sts2dr-sprite-fetcher/2.0"})
+    request = urllib.request.Request(
+        url,
+        headers={"User-Agent": "sts2dr-sprite-fetcher/3.0"},
+    )
     with urllib.request.urlopen(request, timeout=60) as response:
         data = response.read()
     if not data:
@@ -140,49 +167,42 @@ def download(url: str, destination: Path) -> None:
 
 
 def convert_first_frame(source: Path, destination: Path) -> None:
-    """Convert the first animation frame into a normal RGBA PNG."""
-    try:
-        from PIL import Image
-    except ImportError:
-        print("Pillow is required to convert Deltarune sprite animations.", file=sys.stderr)
-        raise SystemExit(2)
+    """Convert the first animation frame to an RGBA PNG using Pillow."""
+    from PIL import Image
 
-    try:
-        with Image.open(source) as image:
-            image.seek(0)
-            frame = image.convert("RGBA")
-            frame.save(destination, format="PNG", optimize=True)
-    except Exception as exc:
-        raise RuntimeError(f"Could not convert {source.name} to PNG: {exc}") from exc
+    with Image.open(source) as image:
+        image.seek(0)
+        frame = image.convert("RGBA")
+        frame.save(destination, format="PNG", optimize=True)
 
 
 def main() -> int:
     OUT.mkdir(parents=True, exist_ok=True)
     temp = OUT / ".sprite-download"
     temp.mkdir(exist_ok=True)
+    resolved: dict[str, dict[str, str]] = {}
 
-    resolved: dict[str, str] = {}
     try:
         for target, spec in SOURCES.items():
-            result = search_file(spec)
-            if not result:
-                raise RuntimeError(f"Could not find a verified Deltarune Wiki sprite for {target}")
+            selected = choose_image(spec)
+            if not selected:
+                raise RuntimeError(f"Could not find a verified battle-sprite image for {target}")
 
-            title, url = result
+            page_path, caption, url = selected
             parsed_name = Path(urllib.parse.urlparse(url).path).name or "source.bin"
             source = temp / parsed_name
-            print(f"{target} <- {title}")
+            print(f"{target} <- {page_path} -> {caption}")
             download(url, source)
             convert_first_frame(source, OUT / target)
-            resolved[target] = title
+            resolved[target] = {"page": absolute_url(page_path), "caption": caption, "url": url}
 
         manifest = {
-            "source": "https://deltarune.wiki/",
-            "description": "Real Deltarune Wiki battle-sprite files, converted to static PNG first frames.",
+            "source": WIKI,
+            "description": "Real Deltarune Wiki battle/ACT/spell artwork, converted to static PNG first frames.",
             "files": resolved,
         }
         (OUT / "SPRITE_SOURCES.json").write_text(
-            json.dumps(manifest, indent=2) + "\n", encoding="utf-8"
+            json.dumps(manifest, indent=2, ensure_ascii=False) + "\n", encoding="utf-8"
         )
         return 0
     finally:

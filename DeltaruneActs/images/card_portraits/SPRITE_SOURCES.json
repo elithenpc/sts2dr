@@ -1,0 +1,61 @@
+{
+  "source": "https://deltarune.wiki",
+  "description": "Real Deltarune Wiki battle/ACT/spell artwork, converted to static PNG first frames.",
+  "files": {
+    "tp_kris.png": {
+      "page": "https://deltarune.wiki/w/Kris",
+      "caption": "Kris's Japanese school uniforms from the \"Flirt\"-based ACTs versus Pink",
+      "url": "https://deltarune.wiki/images/Kris_battle_uniform.gif?cb=3060pf&h=thumb.php&f=Kris_battle_uniform.gif"
+    },
+    "kris_check.png": {
+      "page": "https://deltarune.wiki/w/Kris",
+      "caption": "Kris's Japanese school uniforms from the \"Flirt\"-based ACTs versus Pink",
+      "url": "https://deltarune.wiki/images/Kris_battle_uniform.gif?cb=3060pf&h=thumb.php&f=Kris_battle_uniform.gif"
+    },
+    "kris_compliment.png": {
+      "page": "https://deltarune.wiki/w/Kris",
+      "caption": "Kris's Japanese school uniforms from the \"Flirt\"-based ACTs versus Pink",
+      "url": "https://deltarune.wiki/images/Kris_battle_uniform.gif?cb=3060pf&h=thumb.php&f=Kris_battle_uniform.gif"
+    },
+    "kris_social.png": {
+      "page": "https://deltarune.wiki/w/Kris",
+      "caption": "Kris's Japanese school uniforms from the \"Flirt\"-based ACTs versus Pink",
+      "url": "https://deltarune.wiki/images/Kris_battle_uniform.gif?cb=3060pf&h=thumb.php&f=Kris_battle_uniform.gif"
+    },
+    "kris_spare.png": {
+      "page": "https://deltarune.wiki/w/Kris",
+      "caption": "Kris's Japanese school uniforms from the \"Flirt\"-based ACTs versus Pink",
+      "url": "https://deltarune.wiki/images/Kris_battle_uniform.gif?cb=3060pf&h=thumb.php&f=Kris_battle_uniform.gif"
+    },
+    "kris_magic.png": {
+      "page": "https://deltarune.wiki/w/Kris",
+      "caption": "Kris's \"wan\" sprite from \"OrderX\" versus Tasque Manager",
+      "url": "https://deltarune.wiki/images/Kris_battle_wan.png?cb=9zsf68&h=thumb.php&f=Kris_battle_wan.png"
+    },
+    "ralsei_healprayer.png": {
+      "page": "https://deltarune.wiki/w/Heal_Prayer",
+      "caption": "Ralsei battle spell hatless.gif",
+      "url": "https://deltarune.wiki/images/Ralsei_battle_spell_hatless.gif?cb=gpomkb&h=thumb.php&f=Ralsei_battle_spell_hatless.gif"
+    },
+    "ralsei_heal.png": {
+      "page": "https://deltarune.wiki/w/Heal_Prayer",
+      "caption": "Ralsei battle spell hatless.gif",
+      "url": "https://deltarune.wiki/images/Ralsei_battle_spell_hatless.gif?cb=gpomkb&h=thumb.php&f=Ralsei_battle_spell_hatless.gif"
+    },
+    "susie_rudebuster.png": {
+      "page": "https://deltarune.wiki/w/Rude_Buster",
+      "caption": "Susie battle rudebuster.gif",
+      "url": "https://deltarune.wiki/images/Susie_battle_rudebuster.gif?cb=9m7vbr&h=thumb.php&f=Susie_battle_rudebuster.gif"
+    },
+    "susie_redbuster.png": {
+      "page": "https://deltarune.wiki/w/RedBuster",
+      "caption": "Susie battle rudebuster.gif",
+      "url": "https://deltarune.wiki/images/Susie_battle_rudebuster.gif?cb=9m7vbr&h=thumb.php&f=Susie_battle_rudebuster.gif"
+    },
+    "dual.png": {
+      "page": "https://deltarune.wiki/w/DualHeal",
+      "caption": "Ralsei battle spell hatless.gif",
+      "url": "https://deltarune.wiki/images/Ralsei_battle_spell_hatless.gif?cb=gpomkb&h=thumb.php&f=Ralsei_battle_spell_hatless.gif"
+    }
+  }
+}

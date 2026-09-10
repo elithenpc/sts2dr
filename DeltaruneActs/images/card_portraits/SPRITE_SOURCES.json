@@ -1,61 +1,242 @@
 {
-  "source": "https://deltarune.wiki",
-  "description": "Real Deltarune Wiki battle/ACT/spell artwork, converted to static PNG first frames.",
-  "files": {
-    "tp_kris.png": {
-      "page": "https://deltarune.wiki/w/Kris",
-      "caption": "Kris's Japanese school uniforms from the \"Flirt\"-based ACTs versus Pink",
-      "url": "https://deltarune.wiki/images/Kris_battle_uniform.gif?cb=3060pf&h=thumb.php&f=Kris_battle_uniform.gif"
+  "description": "Verified Deltarune in-game battle sprite frames extracted from DeltamodKit.",
+  "source_repository": "https://github.com/deltamodders/deltamodkit",
+  "source_commit": "aff71f3427fd764ca7b05ad8f93e660975fe6def",
+  "note": "Cards are static, so each portrait uses the middle frame of the real battle animation. Both normal and big portraits come from that same frame.",
+  "cards": {
+    "betterheal": {
+      "asset": "susie_spell.png",
+      "big_asset": "big/susie_spell.png",
+      "character": "Susie",
+      "action": "spell casting",
+      "sprite": "spr_susieb_spell",
+      "frame": "01747e8b-2edb-49a3-80a4-d0633b9ae9ae",
+      "source_url": "https://raw.githubusercontent.com/deltamodders/deltamodkit/aff71f3427fd764ca7b05ad8f93e660975fe6def/sprites/spr_susieb_spell/01747e8b-2edb-49a3-80a4-d0633b9ae9ae.png"
     },
-    "kris_check.png": {
-      "page": "https://deltarune.wiki/w/Kris",
-      "caption": "Kris's Japanese school uniforms from the \"Flirt\"-based ACTs versus Pink",
-      "url": "https://deltarune.wiki/images/Kris_battle_uniform.gif?cb=3060pf&h=thumb.php&f=Kris_battle_uniform.gif"
+    "check": {
+      "asset": "kris_act.png",
+      "big_asset": "big/kris_act.png",
+      "character": "Kris",
+      "action": "ACT",
+      "sprite": "spr_krisb_act",
+      "frame": "69ba1a85-7771-4408-9f25-b6edbc1f493c",
+      "source_url": "https://raw.githubusercontent.com/deltamodders/deltamodkit/aff71f3427fd764ca7b05ad8f93e660975fe6def/sprites/spr_krisb_act/69ba1a85-7771-4408-9f25-b6edbc1f493c.png"
     },
-    "kris_compliment.png": {
-      "page": "https://deltarune.wiki/w/Kris",
-      "caption": "Kris's Japanese school uniforms from the \"Flirt\"-based ACTs versus Pink",
-      "url": "https://deltarune.wiki/images/Kris_battle_uniform.gif?cb=3060pf&h=thumb.php&f=Kris_battle_uniform.gif"
+    "compliment": {
+      "asset": "kris_act.png",
+      "big_asset": "big/kris_act.png",
+      "character": "Kris",
+      "action": "ACT",
+      "sprite": "spr_krisb_act",
+      "frame": "69ba1a85-7771-4408-9f25-b6edbc1f493c",
+      "source_url": "https://raw.githubusercontent.com/deltamodders/deltamodkit/aff71f3427fd764ca7b05ad8f93e660975fe6def/sprites/spr_krisb_act/69ba1a85-7771-4408-9f25-b6edbc1f493c.png"
     },
-    "kris_social.png": {
-      "page": "https://deltarune.wiki/w/Kris",
-      "caption": "Kris's Japanese school uniforms from the \"Flirt\"-based ACTs versus Pink",
-      "url": "https://deltarune.wiki/images/Kris_battle_uniform.gif?cb=3060pf&h=thumb.php&f=Kris_battle_uniform.gif"
+    "dualbuster": {
+      "asset": "susie_spell.png",
+      "big_asset": "big/susie_spell.png",
+      "character": "Susie",
+      "action": "spell casting",
+      "sprite": "spr_susieb_spell",
+      "frame": "01747e8b-2edb-49a3-80a4-d0633b9ae9ae",
+      "source_url": "https://raw.githubusercontent.com/deltamodders/deltamodkit/aff71f3427fd764ca7b05ad8f93e660975fe6def/sprites/spr_susieb_spell/01747e8b-2edb-49a3-80a4-d0633b9ae9ae.png"
     },
-    "kris_spare.png": {
-      "page": "https://deltarune.wiki/w/Kris",
-      "caption": "Kris's Japanese school uniforms from the \"Flirt\"-based ACTs versus Pink",
-      "url": "https://deltarune.wiki/images/Kris_battle_uniform.gif?cb=3060pf&h=thumb.php&f=Kris_battle_uniform.gif"
+    "dualheal": {
+      "asset": "ralsei_spell.png",
+      "big_asset": "big/ralsei_spell.png",
+      "character": "Ralsei",
+      "action": "spell casting",
+      "sprite": "spr_ralsei_spell",
+      "frame": "07bcca1e-75d9-4b46-b67d-1940ae8f9dea",
+      "source_url": "https://raw.githubusercontent.com/deltamodders/deltamodkit/aff71f3427fd764ca7b05ad8f93e660975fe6def/sprites/spr_ralsei_spell/07bcca1e-75d9-4b46-b67d-1940ae8f9dea.png"
     },
-    "kris_magic.png": {
-      "page": "https://deltarune.wiki/w/Kris",
-      "caption": "Kris's \"wan\" sprite from \"OrderX\" versus Tasque Manager",
-      "url": "https://deltarune.wiki/images/Kris_battle_wan.png?cb=9zsf68&h=thumb.php&f=Kris_battle_wan.png"
+    "flirt": {
+      "asset": "kris_act.png",
+      "big_asset": "big/kris_act.png",
+      "character": "Kris",
+      "action": "ACT",
+      "sprite": "spr_krisb_act",
+      "frame": "69ba1a85-7771-4408-9f25-b6edbc1f493c",
+      "source_url": "https://raw.githubusercontent.com/deltamodders/deltamodkit/aff71f3427fd764ca7b05ad8f93e660975fe6def/sprites/spr_krisb_act/69ba1a85-7771-4408-9f25-b6edbc1f493c.png"
     },
-    "ralsei_healprayer.png": {
-      "page": "https://deltarune.wiki/w/Heal_Prayer",
-      "caption": "Ralsei battle spell hatless.gif",
-      "url": "https://deltarune.wiki/images/Ralsei_battle_spell_hatless.gif?cb=gpomkb&h=thumb.php&f=Ralsei_battle_spell_hatless.gif"
+    "healing": {
+      "asset": "susie_spell.png",
+      "big_asset": "big/susie_spell.png",
+      "character": "Susie",
+      "action": "spell casting",
+      "sprite": "spr_susieb_spell",
+      "frame": "01747e8b-2edb-49a3-80a4-d0633b9ae9ae",
+      "source_url": "https://raw.githubusercontent.com/deltamodders/deltamodkit/aff71f3427fd764ca7b05ad8f93e660975fe6def/sprites/spr_susieb_spell/01747e8b-2edb-49a3-80a4-d0633b9ae9ae.png"
     },
-    "ralsei_heal.png": {
-      "page": "https://deltarune.wiki/w/Heal_Prayer",
-      "caption": "Ralsei battle spell hatless.gif",
-      "url": "https://deltarune.wiki/images/Ralsei_battle_spell_hatless.gif?cb=gpomkb&h=thumb.php&f=Ralsei_battle_spell_hatless.gif"
+    "healprayer": {
+      "asset": "ralsei_spell.png",
+      "big_asset": "big/ralsei_spell.png",
+      "character": "Ralsei",
+      "action": "spell casting",
+      "sprite": "spr_ralsei_spell",
+      "frame": "07bcca1e-75d9-4b46-b67d-1940ae8f9dea",
+      "source_url": "https://raw.githubusercontent.com/deltamodders/deltamodkit/aff71f3427fd764ca7b05ad8f93e660975fe6def/sprites/spr_ralsei_spell/07bcca1e-75d9-4b46-b67d-1940ae8f9dea.png"
     },
-    "susie_rudebuster.png": {
-      "page": "https://deltarune.wiki/w/Rude_Buster",
-      "caption": "Susie battle rudebuster.gif",
-      "url": "https://deltarune.wiki/images/Susie_battle_rudebuster.gif?cb=9m7vbr&h=thumb.php&f=Susie_battle_rudebuster.gif"
+    "iceshock": {
+      "asset": "noelle_spell.png",
+      "big_asset": "big/noelle_spell.png",
+      "character": "Noelle",
+      "action": "spell casting",
+      "sprite": "spr_noelleb_spell",
+      "frame": "9d957760-85ec-4f3c-954e-e61a19c6184b",
+      "source_url": "https://raw.githubusercontent.com/deltamodders/deltamodkit/aff71f3427fd764ca7b05ad8f93e660975fe6def/sprites/spr_noelleb_spell/9d957760-85ec-4f3c-954e-e61a19c6184b.png"
     },
-    "susie_redbuster.png": {
-      "page": "https://deltarune.wiki/w/RedBuster",
-      "caption": "Susie battle rudebuster.gif",
-      "url": "https://deltarune.wiki/images/Susie_battle_rudebuster.gif?cb=9m7vbr&h=thumb.php&f=Susie_battle_rudebuster.gif"
+    "joke": {
+      "asset": "kris_act.png",
+      "big_asset": "big/kris_act.png",
+      "character": "Kris",
+      "action": "ACT",
+      "sprite": "spr_krisb_act",
+      "frame": "69ba1a85-7771-4408-9f25-b6edbc1f493c",
+      "source_url": "https://raw.githubusercontent.com/deltamodders/deltamodkit/aff71f3427fd764ca7b05ad8f93e660975fe6def/sprites/spr_krisb_act/69ba1a85-7771-4408-9f25-b6edbc1f493c.png"
     },
-    "dual.png": {
-      "page": "https://deltarune.wiki/w/DualHeal",
-      "caption": "Ralsei battle spell hatless.gif",
-      "url": "https://deltarune.wiki/images/Ralsei_battle_spell_hatless.gif?cb=gpomkb&h=thumb.php&f=Ralsei_battle_spell_hatless.gif"
+    "lightup": {
+      "asset": "ralsei_spell.png",
+      "big_asset": "big/ralsei_spell.png",
+      "character": "Ralsei",
+      "action": "spell casting",
+      "sprite": "spr_ralsei_spell",
+      "frame": "07bcca1e-75d9-4b46-b67d-1940ae8f9dea",
+      "source_url": "https://raw.githubusercontent.com/deltamodders/deltamodkit/aff71f3427fd764ca7b05ad8f93e660975fe6def/sprites/spr_ralsei_spell/07bcca1e-75d9-4b46-b67d-1940ae8f9dea.png"
+    },
+    "okayheal": {
+      "asset": "susie_spell.png",
+      "big_asset": "big/susie_spell.png",
+      "character": "Susie",
+      "action": "spell casting",
+      "sprite": "spr_susieb_spell",
+      "frame": "01747e8b-2edb-49a3-80a4-d0633b9ae9ae",
+      "source_url": "https://raw.githubusercontent.com/deltamodders/deltamodkit/aff71f3427fd764ca7b05ad8f93e660975fe6def/sprites/spr_susieb_spell/01747e8b-2edb-49a3-80a4-d0633b9ae9ae.png"
+    },
+    "pacify": {
+      "asset": "ralsei_spell.png",
+      "big_asset": "big/ralsei_spell.png",
+      "character": "Ralsei",
+      "action": "spell casting",
+      "sprite": "spr_ralsei_spell",
+      "frame": "07bcca1e-75d9-4b46-b67d-1940ae8f9dea",
+      "source_url": "https://raw.githubusercontent.com/deltamodders/deltamodkit/aff71f3427fd764ca7b05ad8f93e660975fe6def/sprites/spr_ralsei_spell/07bcca1e-75d9-4b46-b67d-1940ae8f9dea.png"
+    },
+    "redbuster": {
+      "asset": "susie_spell.png",
+      "big_asset": "big/susie_spell.png",
+      "character": "Susie",
+      "action": "spell casting",
+      "sprite": "spr_susieb_spell",
+      "frame": "01747e8b-2edb-49a3-80a4-d0633b9ae9ae",
+      "source_url": "https://raw.githubusercontent.com/deltamodders/deltamodkit/aff71f3427fd764ca7b05ad8f93e660975fe6def/sprites/spr_susieb_spell/01747e8b-2edb-49a3-80a4-d0633b9ae9ae.png"
+    },
+    "revivekris": {
+      "asset": "ralsei_spell.png",
+      "big_asset": "big/ralsei_spell.png",
+      "character": "Ralsei",
+      "action": "spell casting",
+      "sprite": "spr_ralsei_spell",
+      "frame": "07bcca1e-75d9-4b46-b67d-1940ae8f9dea",
+      "source_url": "https://raw.githubusercontent.com/deltamodders/deltamodkit/aff71f3427fd764ca7b05ad8f93e660975fe6def/sprites/spr_ralsei_spell/07bcca1e-75d9-4b46-b67d-1940ae8f9dea.png"
+    },
+    "revivesong": {
+      "asset": "ralsei_spell.png",
+      "big_asset": "big/ralsei_spell.png",
+      "character": "Ralsei",
+      "action": "spell casting",
+      "sprite": "spr_ralsei_spell",
+      "frame": "07bcca1e-75d9-4b46-b67d-1940ae8f9dea",
+      "source_url": "https://raw.githubusercontent.com/deltamodders/deltamodkit/aff71f3427fd764ca7b05ad8f93e660975fe6def/sprites/spr_ralsei_spell/07bcca1e-75d9-4b46-b67d-1940ae8f9dea.png"
+    },
+    "rudebuster": {
+      "asset": "susie_spell.png",
+      "big_asset": "big/susie_spell.png",
+      "character": "Susie",
+      "action": "spell casting",
+      "sprite": "spr_susieb_spell",
+      "frame": "01747e8b-2edb-49a3-80a4-d0633b9ae9ae",
+      "source_url": "https://raw.githubusercontent.com/deltamodders/deltamodkit/aff71f3427fd764ca7b05ad8f93e660975fe6def/sprites/spr_susieb_spell/01747e8b-2edb-49a3-80a4-d0633b9ae9ae.png"
+    },
+    "rudesword": {
+      "asset": "susie_spell.png",
+      "big_asset": "big/susie_spell.png",
+      "character": "Susie",
+      "action": "spell casting",
+      "sprite": "spr_susieb_spell",
+      "frame": "01747e8b-2edb-49a3-80a4-d0633b9ae9ae",
+      "source_url": "https://raw.githubusercontent.com/deltamodders/deltamodkit/aff71f3427fd764ca7b05ad8f93e660975fe6def/sprites/spr_susieb_spell/01747e8b-2edb-49a3-80a4-d0633b9ae9ae.png"
+    },
+    "scythemare": {
+      "asset": "susie_spell.png",
+      "big_asset": "big/susie_spell.png",
+      "character": "Susie",
+      "action": "spell casting",
+      "sprite": "spr_susieb_spell",
+      "frame": "01747e8b-2edb-49a3-80a4-d0633b9ae9ae",
+      "source_url": "https://raw.githubusercontent.com/deltamodders/deltamodkit/aff71f3427fd764ca7b05ad8f93e660975fe6def/sprites/spr_susieb_spell/01747e8b-2edb-49a3-80a4-d0633b9ae9ae.png"
+    },
+    "sleepmist": {
+      "asset": "noelle_spell.png",
+      "big_asset": "big/noelle_spell.png",
+      "character": "Noelle",
+      "action": "spell casting",
+      "sprite": "spr_noelleb_spell",
+      "frame": "9d957760-85ec-4f3c-954e-e61a19c6184b",
+      "source_url": "https://raw.githubusercontent.com/deltamodders/deltamodkit/aff71f3427fd764ca7b05ad8f93e660975fe6def/sprites/spr_noelleb_spell/9d957760-85ec-4f3c-954e-e61a19c6184b.png"
+    },
+    "snowgrave": {
+      "asset": "noelle_spell.png",
+      "big_asset": "big/noelle_spell.png",
+      "character": "Noelle",
+      "action": "spell casting",
+      "sprite": "spr_noelleb_spell",
+      "frame": "9d957760-85ec-4f3c-954e-e61a19c6184b",
+      "source_url": "https://raw.githubusercontent.com/deltamodders/deltamodkit/aff71f3427fd764ca7b05ad8f93e660975fe6def/sprites/spr_noelleb_spell/9d957760-85ec-4f3c-954e-e61a19c6184b.png"
+    },
+    "spare": {
+      "asset": "kris_act.png",
+      "big_asset": "big/kris_act.png",
+      "character": "Kris",
+      "action": "ACT",
+      "sprite": "spr_krisb_act",
+      "frame": "69ba1a85-7771-4408-9f25-b6edbc1f493c",
+      "source_url": "https://raw.githubusercontent.com/deltamodders/deltamodkit/aff71f3427fd764ca7b05ad8f93e660975fe6def/sprites/spr_krisb_act/69ba1a85-7771-4408-9f25-b6edbc1f493c.png"
+    },
+    "ultimateheal": {
+      "asset": "susie_spell.png",
+      "big_asset": "big/susie_spell.png",
+      "character": "Susie",
+      "action": "spell casting",
+      "sprite": "spr_susieb_spell",
+      "frame": "01747e8b-2edb-49a3-80a4-d0633b9ae9ae",
+      "source_url": "https://raw.githubusercontent.com/deltamodders/deltamodkit/aff71f3427fd764ca7b05ad8f93e660975fe6def/sprites/spr_susieb_spell/01747e8b-2edb-49a3-80a4-d0633b9ae9ae.png"
+    },
+    "ultraheal": {
+      "asset": "susie_spell.png",
+      "big_asset": "big/susie_spell.png",
+      "character": "Susie",
+      "action": "spell casting",
+      "sprite": "spr_susieb_spell",
+      "frame": "01747e8b-2edb-49a3-80a4-d0633b9ae9ae",
+      "source_url": "https://raw.githubusercontent.com/deltamodders/deltamodkit/aff71f3427fd764ca7b05ad8f93e660975fe6def/sprites/spr_susieb_spell/01747e8b-2edb-49a3-80a4-d0633b9ae9ae.png"
+    },
+    "wakekris": {
+      "asset": "susie_spell.png",
+      "big_asset": "big/susie_spell.png",
+      "character": "Susie",
+      "action": "spell casting",
+      "sprite": "spr_susieb_spell",
+      "frame": "01747e8b-2edb-49a3-80a4-d0633b9ae9ae",
+      "source_url": "https://raw.githubusercontent.com/deltamodders/deltamodkit/aff71f3427fd764ca7b05ad8f93e660975fe6def/sprites/spr_susieb_spell/01747e8b-2edb-49a3-80a4-d0633b9ae9ae.png"
+    },
+    "warn": {
+      "asset": "kris_act.png",
+      "big_asset": "big/kris_act.png",
+      "character": "Kris",
+      "action": "ACT",
+      "sprite": "spr_krisb_act",
+      "frame": "69ba1a85-7771-4408-9f25-b6edbc1f493c",
+      "source_url": "https://raw.githubusercontent.com/deltamodders/deltamodkit/aff71f3427fd764ca7b05ad8f93e660975fe6def/sprites/spr_krisb_act/69ba1a85-7771-4408-9f25-b6edbc1f493c.png"
     }
   }
 }

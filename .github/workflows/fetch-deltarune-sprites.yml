@@ -1,0 +1,39 @@
+name: Prepare Deltarune Sprite Art
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "tools/fetch_deltarune_sprites.py"
+      - "DeltaruneActs/Cards/DeltaruneActsCard.cs"
+      - ".github/workflows/fetch-deltarune-sprites.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  sprites:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Install ImageMagick
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y imagemagick
+
+      - name: Fetch and convert real Deltarune sprites
+        run: python3 tools/fetch_deltarune_sprites.py
+
+      - name: Commit generated sprite portraits
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add DeltaruneActs/images/card_portraits/*.png DeltaruneActs/images/card_portraits/SPRITE_SOURCES.json
+          if git diff --cached --quiet; then
+            echo "Sprite portraits are already up to date."
+            exit 0
+          fi
+          git commit -m "Prepare real Deltarune sprite card art"
+          git push

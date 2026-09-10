@@ -23,17 +23,40 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y python3-pil
 
-      - name: Fetch and convert real Deltarune sprites
+      - name: Generate verified real Deltarune battle-sprite portraits
         run: python3 tools/fetch_deltarune_sprites.py
+
+      - name: Verify every card asset exists
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+
+          root = Path("DeltaruneActs/images/card_portraits")
+          manifest = json.loads((root / "SPRITE_SOURCES.json").read_text(encoding="utf-8"))
+          cards = manifest.get("cards", {})
+          if not cards:
+              raise SystemExit("No card artwork entries were generated")
+
+          missing = []
+          for card, item in cards.items():
+              for rel in (item["asset"], item["big_asset"]):
+                  if not (root / rel).is_file():
+                      missing.append(f"{card}: {rel}")
+          if missing:
+              raise SystemExit("Missing generated card art:\n" + "\n".join(missing))
+
+          print(f"Verified {len(cards)} card artwork entries and both portrait sizes.")
+          PY
 
       - name: Commit generated sprite portraits
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add DeltaruneActs/images/card_portraits/*.png DeltaruneActs/images/card_portraits/SPRITE_SOURCES.json
+          git add DeltaruneActs/images/card_portraits/*.png DeltaruneActs/images/card_portraits/big/*.png DeltaruneActs/images/card_portraits/SPRITE_SOURCES.json
           if git diff --cached --quiet; then
             echo "Sprite portraits are already up to date."
             exit 0
           fi
-          git commit -m "Prepare real Deltarune sprite card art"
+          git commit -m "Prepare verified Deltarune sprite card art"
           git push

@@ -42,7 +42,9 @@ public abstract class DeltaruneActsCard(int cost, CardType type, CardRarity rari
         _ => "kris_social"
     };
 
-    public override string CustomPortraitPath => $"{ArtRoot}{ArtName}.svg";
-    public override string PortraitPath => $"{ArtRoot}{ArtName}.svg";
+    // The real Deltarune battle animations are prepared as PNG portraits by
+    // tools/fetch_deltarune_sprites.py.
+    public override string CustomPortraitPath => $"{ArtRoot}{ArtName}.png";
+    public override string PortraitPath => $"{ArtRoot}{ArtName}.png";
     public override string BetaPortraitPath => PortraitPath;
 }

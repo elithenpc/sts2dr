@@ -46,54 +46,77 @@ internal static class TPCombatUiExitTreePatch
     }
 }
 
-internal sealed partial class TPDisplay : PanelContainer
+internal sealed partial class TPDisplay : Control
 {
-    private readonly Label _label;
+    private const string SpritePath = "res://DeltaruneActs/images/card_portraits/tp_kris.png";
+
+    private readonly TPMeter _meter;
+    private readonly Label _percentLabel;
 
     public TPDisplay()
     {
         Name = "DeltaruneTPDisplay";
         MouseFilter = MouseFilterEnum.Ignore;
         ZIndex = 100;
+
+        // Deltarune's TP meter is a tall vertical gauge on the left side.
         AnchorLeft = 0f;
         AnchorRight = 0f;
-        AnchorTop = 0f;
-        AnchorBottom = 0f;
-        OffsetLeft = 22f;
-        OffsetRight = 190f;
-        OffsetTop = 22f;
-        OffsetBottom = 68f;
+        AnchorTop = 0.5f;
+        AnchorBottom = 0.5f;
+        OffsetLeft = 8f;
+        OffsetRight = 118f;
+        OffsetTop = -185f;
+        OffsetBottom = 185f;
 
-        var panel = new StyleBoxFlat
+        _meter = new TPMeter
         {
-            BgColor = new Color(0.06f, 0.07f, 0.11f, 0.92f),
-            BorderColor = new Color(0.45f, 0.85f, 1f, 0.9f),
-            BorderWidthLeft = 2,
-            BorderWidthRight = 2,
-            BorderWidthTop = 2,
-            BorderWidthBottom = 2,
-            CornerRadiusTopLeft = 8,
-            CornerRadiusTopRight = 8,
-            CornerRadiusBottomLeft = 8,
-            CornerRadiusBottomRight = 8
+            Position = new Vector2(54f, 36f),
+            Size = new Vector2(26f, 288f)
         };
-        AddThemeStyleboxOverride("panel", panel);
+        AddChild(_meter);
 
-        var margin = new MarginContainer();
-        margin.AddThemeConstantOverride("margin_left", 10);
-        margin.AddThemeConstantOverride("margin_right", 10);
-        margin.AddThemeConstantOverride("margin_top", 5);
-        margin.AddThemeConstantOverride("margin_bottom", 5);
-        AddChild(margin);
-
-        _label = new Label
+        var tpLabel = new Label
         {
-            Text = "TP: 0 / 100",
+            Text = "TP",
+            Position = new Vector2(2f, 128f),
+            Size = new Vector2(46f, 28f),
             HorizontalAlignment = HorizontalAlignment.Center,
             VerticalAlignment = VerticalAlignment.Center
         };
-        _label.AddThemeColorOverride("font_color", new Color(0.7f, 0.92f, 1f));
-        margin.AddChild(_label);
+        tpLabel.AddThemeFontSizeOverride("font_size", 17);
+        tpLabel.AddThemeColorOverride("font_color", Colors.White);
+        tpLabel.AddThemeColorOverride("font_shadow_color", Colors.Black);
+        tpLabel.AddThemeConstantOverride("shadow_offset_x", 2);
+        tpLabel.AddThemeConstantOverride("shadow_offset_y", 2);
+        AddChild(tpLabel);
+
+        _percentLabel = new Label
+        {
+            Text = "0%",
+            Position = new Vector2(0f, 154f),
+            Size = new Vector2(50f, 30f),
+            HorizontalAlignment = HorizontalAlignment.Center,
+            VerticalAlignment = VerticalAlignment.Center
+        };
+        _percentLabel.AddThemeFontSizeOverride("font_size", 17);
+        _percentLabel.AddThemeColorOverride("font_color", Colors.White);
+        _percentLabel.AddThemeColorOverride("font_shadow_color", Colors.Black);
+        _percentLabel.AddThemeConstantOverride("shadow_offset_x", 2);
+        _percentLabel.AddThemeConstantOverride("shadow_offset_y", 2);
+        AddChild(_percentLabel);
+
+        // Use a real Deltarune battle sprite as the TP ornament.
+        var sprite = new TextureRect
+        {
+            Texture = GD.Load<Texture2D>(SpritePath),
+            Position = new Vector2(76f, 6f),
+            Size = new Vector2(34f, 50f),
+            ExpandMode = TextureRect.ExpandModeEnum.IgnoreSize,
+            StretchMode = TextureRect.StretchModeEnum.KeepAspectCentered,
+            MouseFilter = MouseFilterEnum.Ignore
+        };
+        AddChild(sprite);
 
         TPManager.Changed += Refresh;
         TreeExiting += OnTreeExiting;
@@ -104,11 +127,44 @@ internal sealed partial class TPDisplay : PanelContainer
         if (!GodotObject.IsInstanceValid(this))
             return;
 
-        _label.Text = $"TP: {TPManager.Current} / {TPManager.MaxTP}";
+        var current = Math.Clamp(TPManager.Current, 0, TPManager.MaxTP);
+        _percentLabel.Text = $"{current}%";
+        _meter.Value = current;
+        _meter.QueueRedraw();
     }
 
     private void OnTreeExiting()
     {
         TPManager.Changed -= Refresh;
+    }
+}
+
+internal sealed partial class TPMeter : Control
+{
+    public int Value { get; set; }
+
+    public override void _Draw()
+    {
+        const float width = 22f;
+        const float height = 286f;
+        const float inset = 4f;
+
+        var outer = new Rect2(0f, 0f, width, height);
+        DrawRect(outer, new Color(0.03f, 0.03f, 0.04f, 1f), true);
+        DrawRect(outer, new Color(0.95f, 0.95f, 0.95f, 1f), false, 2f);
+
+        var inner = new Rect2(inset, inset, width - inset * 2f, height - inset * 2f);
+        DrawRect(inner, new Color(0.15f, 0.06f, 0.02f, 1f), true);
+
+        var amount = Math.Clamp(Value, 0, 100) / 100f;
+        var fillHeight = inner.Size.Y * amount;
+        if (fillHeight > 0f)
+        {
+            var fill = new Rect2(inner.Position.X, inner.End.Y - fillHeight, inner.Size.X, fillHeight);
+            DrawRect(fill, new Color(1f, 0.58f, 0.05f, 1f), true);
+
+            var edgeY = inner.End.Y - fillHeight;
+            DrawLine(new Vector2(inner.Position.X, edgeY), new Vector2(inner.End.X, edgeY), Colors.White, 1f);
+        }
     }
 }

@@ -11,40 +11,51 @@ public abstract class DeltaruneActsCard(int cost, CardType type, CardRarity rari
     : CustomCardModel(cost, type, rarity, target)
 {
     private const string ArtRoot = "res://DeltaruneActs/images/card_portraits/";
+    private const string BigArtRoot = "res://DeltaruneActs/images/card_portraits/big/";
 
     private string ArtName => GetType().Name switch
     {
-        nameof(Check) => "kris_check",
-        nameof(Compliment) => "kris_compliment",
-        nameof(Warn) => "kris_social",
-        nameof(Joke) => "kris_social",
-        nameof(Flirt) => "kris_compliment",
-        nameof(Spare) => "kris_spare",
-        nameof(HealPrayer) => "ralsei_healprayer",
-        nameof(Healing) => "ralsei_heal",
-        nameof(OkayHeal) => "ralsei_heal",
-        nameof(BetterHeal) => "ralsei_heal",
-        nameof(UltraHeal) => "ralsei_heal",
-        nameof(UltimateHeal) => "ralsei_heal",
-        nameof(DualHeal) => "dual",
-        nameof(RudeBuster) => "susie_rudebuster",
-        nameof(RedBuster) => "susie_redbuster",
-        nameof(RudeSword) => "susie_rudebuster",
-        nameof(Scythemare) => "susie_rudebuster",
-        nameof(IceShock) => "kris_magic",
-        nameof(SnowGrave) => "kris_magic",
-        nameof(DualBuster) => "dual",
-        nameof(LightUp) => "ralsei_healprayer",
-        nameof(WakeKris) => "kris_magic",
-        nameof(ReviveKris) => "kris_magic",
-        nameof(ReviveSong) => "ralsei_healprayer",
-        nameof(SleepMist) => "ralsei_healprayer",
-        _ => "kris_social"
+        // Kris ACT cards use Kris's real battle ACT animation.
+        nameof(Check) => "kris_act",
+        nameof(Compliment) => "kris_act",
+        nameof(Warn) => "kris_act",
+        nameof(Joke) => "kris_act",
+        nameof(Flirt) => "kris_act",
+        nameof(Spare) => "kris_act",
+
+        // Ralsei support / spell cards use his actual battle spell animation.
+        nameof(HealPrayer) => "ralsei_spell",
+        nameof(DualHeal) => "ralsei_spell",
+        nameof(Pacify) => "ralsei_spell",
+        nameof(ReviveKris) => "ralsei_spell",
+        nameof(ReviveSong) => "ralsei_spell",
+        nameof(LightUp) => "ralsei_spell",
+
+        // Susie spell cards use her actual battle spell animation.
+        nameof(Healing) => "susie_spell",
+        nameof(OkayHeal) => "susie_spell",
+        nameof(BetterHeal) => "susie_spell",
+        nameof(UltraHeal) => "susie_spell",
+        nameof(UltimateHeal) => "susie_spell",
+        nameof(RudeBuster) => "susie_spell",
+        nameof(RedBuster) => "susie_spell",
+        nameof(DualBuster) => "susie_spell",
+        nameof(RudeSword) => "susie_spell",
+        nameof(Scythemare) => "susie_spell",
+        nameof(WakeKris) => "susie_spell",
+
+        // These are specifically Noelle's spells, so they must never use Kris art.
+        nameof(IceShock) => "noelle_spell",
+        nameof(SnowGrave) => "noelle_spell",
+        nameof(SleepMist) => "noelle_spell",
+
+        _ => "kris_act"
     };
 
-    // The real Deltarune battle animations are prepared as PNG portraits by
-    // tools/fetch_deltarune_sprites.py.
-    public override string CustomPortraitPath => $"{ArtRoot}{ArtName}.png";
+    // BaseLib consumes the normal portrait for the card and the big portrait
+    // when the card is enlarged. Both files are generated from the same real
+    // Deltarune battle-sprite frame, so the artwork cannot disagree between views.
     public override string PortraitPath => $"{ArtRoot}{ArtName}.png";
+    public override string CustomPortraitPath => $"{BigArtRoot}{ArtName}.png";
     public override string BetaPortraitPath => PortraitPath;
 }

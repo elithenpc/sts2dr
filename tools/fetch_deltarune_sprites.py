@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
-"""Fetch verified Deltarune battle-sprite art and convert it to card PNGs."""
+"""Fetch verified Deltarune battle/action/spell art and convert it to card PNGs."""
 from __future__ import annotations
 
 import json
-import re
 import urllib.parse
 import urllib.request
 from html.parser import HTMLParser
@@ -13,55 +12,40 @@ ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "DeltaruneActs" / "images" / "card_portraits"
 WIKI = "https://deltarune.wiki"
 
-# These are real article pages which document the corresponding in-battle
-# character/spell artwork. We pick an image whose caption/URL identifies the
-# character and the relevant ACT/spell, rather than accepting an arbitrary
-# search result.
+# IMPORTANT: filenames here match DeltaruneActsCard.CardName(Id.Entry), which
+# means a card named IceShock must produce iceshock.png, RudeBuster must
+# produce rudebuster.png, etc. Each entry is restricted to the exact
+# Deltarune Wiki gallery/action caption needed for that card.
 SOURCES = {
-    "tp_kris.png": {
-        "pages": [("/w/Kris", ["kris", "standard act"]), ("/w/ACT", ["kris", "act"])],
-        "required": [["kris"], ["act"]],
-    },
-    "kris_check.png": {
-        "pages": [("/w/ACT", ["kris", "act"]), ("/w/Kris", ["kris", "standard act"])],
-        "required": [["kris"], ["act"]],
-    },
-    "kris_compliment.png": {
-        "pages": [("/w/ACT", ["kris", "act"]), ("/w/Kris", ["kris", "standard act"])],
-        "required": [["kris"], ["act"]],
-    },
-    "kris_social.png": {
-        "pages": [("/w/ACT", ["kris", "act"]), ("/w/Kris", ["kris", "standard act"])],
-        "required": [["kris"], ["act"]],
-    },
-    "kris_spare.png": {
-        "pages": [("/w/ACT", ["kris", "act"]), ("/w/Kris", ["kris", "standard act"])],
-        "required": [["kris"], ["act"]],
-    },
-    "kris_magic.png": {
-        "pages": [("/w/Kris", ["kris", "spell"]), ("/w/Spells", ["kris", "spell"])],
-        "required": [["kris"], ["spell", "magic", "battle"]],
-    },
-    "ralsei_healprayer.png": {
-        "pages": [("/w/Heal_Prayer", ["ralsei", "heal prayer"]), ("/w/Ralsei", ["ralsei", "battle", "spell"])],
-        "required": [["ralsei"], ["heal", "prayer", "spell"]],
-    },
-    "ralsei_heal.png": {
-        "pages": [("/w/Heal_Prayer", ["ralsei", "heal"]), ("/w/Spells", ["ralsei", "spell"])],
-        "required": [["ralsei"], ["heal", "spell", "battle"]],
-    },
-    "susie_rudebuster.png": {
-        "pages": [("/w/Rude_Buster", ["susie", "rude buster"]), ("/w/Susie", ["susie", "spell"])],
-        "required": [["susie"], ["rude", "buster"]],
-    },
-    "susie_redbuster.png": {
-        "pages": [("/w/RedBuster", ["susie", "redbuster"]), ("/w/Susie", ["susie", "buster"])],
-        "required": [["susie"], ["redbuster", "buster"]],
-    },
-    "dual.png": {
-        "pages": [("/w/DualHeal", ["ralsei", "dualheal"]), ("/w/Spells", ["ralsei", "dualheal"])],
-        "required": [["ralsei"], ["dual", "heal", "spell"]],
-    },
+    "check.png": {"pages": [("/w/Kris", ["standard act"])], "required": [["kris"], ["standard act"]]},
+    "compliment.png": {"pages": [("/w/Kris", ["standard act"])], "required": [["kris"], ["standard act"]]},
+    "spare.png": {"pages": [("/w/Kris", ["standard act"])], "required": [["kris"], ["standard act"]]},
+    "flirt.png": {"pages": [("/w/Kris", ["flirt", "japanese school uniforms"])], "required": [["kris"], ["flirt"]]},
+    "kris_magic.png": {"pages": [("/w/Kris", ["standard act"])], "required": [["kris"], ["standard act"]]},
+
+    "healprayer.png": {"pages": [("/w/Heal_Prayer", ["ralsei casting heal prayer"])], "required": [["ralsei"], ["heal prayer"]]},
+    "dualheal.png": {"pages": [("/w/Dual_Heal", ["ralsei casting dualheal"])], "required": [["ralsei"], ["dualheal"]]},
+    "pacify.png": {"pages": [("/w/Pacify", ["ralsei", "pacify"])], "required": [["ralsei"], ["pacify"]]},
+    "revivesong.png": {"pages": [("/w/ReviveSong", ["ralsei", "revivesong"])], "required": [["ralsei"], ["revivesong"]]},
+    "revivekris.png": {"pages": [("/w/ReviveKris", ["ralsei", "revivekris"])], "required": [["ralsei"], ["revivekris"]]},
+
+    "rudebuster.png": {"pages": [("/w/Rude_Buster", ["susie using rude buster"])], "required": [["susie"], ["rude buster"]]},
+    "redbuster.png": {"pages": [("/w/RedBuster", ["susie using redbuster"])], "required": [["susie"], ["redbuster"]]},
+    "dualbuster.png": {"pages": [("/w/DualBuster", ["dualbuster", "susie"])], "required": [["dualbuster"], ["susie"]]},
+    "scythemare.png": {"pages": [("/w/Scythemare", ["scythemare", "susie"])], "required": [["scythemare"], ["susie"]]},
+    "wakekris.png": {"pages": [("/w/WakeKris", ["susie", "wake kris"])], "required": [["susie"], ["wake"]]},
+    "healing.png": {"pages": [("/w/Susie%27s_Healing", ["susie casting her healing magic"])], "required": [["susie"], ["healing magic"]]},
+    "okayheal.png": {"pages": [("/w/Susie%27s_Healing", ["susie casting her healing magic"])], "required": [["susie"], ["healing magic"]]},
+    "betterheal.png": {"pages": [("/w/Susie%27s_Healing", ["susie casting her healing magic"])], "required": [["susie"], ["healing magic"]]},
+    "ultraheal.png": {"pages": [("/w/Susie%27s_Healing", ["susie casting her healing magic"])], "required": [["susie"], ["healing magic"]]},
+    "ultimateheal.png": {"pages": [("/w/Susie%27s_Healing", ["susie casting her healing magic"])], "required": [["susie"], ["healing magic"]]},
+
+    # These two are intentionally Noelle, not a generic ice spell or Kris art.
+    "iceshock.png": {"pages": [("/w/IceShock", ["noelle casting iceshock"])], "required": [["noelle"], ["iceshock"]]},
+    "snowgrave.png": {"pages": [("/w/SnowGrave", ["noelle casting snowgrave"])], "required": [["noelle"], ["snowgrave"]]},
+    "sleepmist.png": {"pages": [("/w/Sleep_Mist", ["sleep mist", "noelle"])], "required": [["noelle"], ["sleep mist"]]},
+
+    "tp_kris.png": {"pages": [("/w/Kris", ["standard act"])], "required": [["kris"], ["standard act"]]},
 }
 
 IMAGE_EXTENSIONS = (".gif", ".png", ".webp", ".apng", ".jpg", ".jpeg")
@@ -86,10 +70,7 @@ class ImageParser(HTMLParser):
 
 
 def fetch_text(url: str) -> str:
-    request = urllib.request.Request(
-        url,
-        headers={"User-Agent": "sts2dr-sprite-fetcher/3.0"},
-    )
+    request = urllib.request.Request(url, headers={"User-Agent": "sts2dr-sprite-fetcher/4.0"})
     with urllib.request.urlopen(request, timeout=60) as response:
         return response.read().decode("utf-8", errors="replace")
 
@@ -99,15 +80,13 @@ def absolute_url(url: str) -> str:
 
 
 def image_candidates(page_path: str) -> list[tuple[str, str]]:
-    page_url = absolute_url(page_path)
     parser = ImageParser()
-    parser.feed(fetch_text(page_url))
+    parser.feed(fetch_text(absolute_url(page_path)))
     candidates: list[tuple[str, str]] = []
     seen: set[str] = set()
     for item in parser.images:
         url = absolute_url(item["url"])
-        parsed = urllib.parse.urlparse(url)
-        path = parsed.path.lower()
+        path = urllib.parse.urlparse(url).path.lower()
         if not path.endswith(IMAGE_EXTENSIONS) or url in seen:
             continue
         seen.add(url)
@@ -135,15 +114,15 @@ def choose_image(spec: dict[str, object]) -> tuple[str, str, str] | None:
             if not title_matches_required(text, required):
                 continue
             lowered = text.lower()
-            score = sum(8 for term in preferred_terms if term.lower() in lowered)
+            score = sum(20 for term in preferred_terms if term.lower() in lowered)
             if "sprite" in lowered:
                 score += 5
             if "battle" in lowered:
                 score += 4
             if "icon" in lowered or "logo" in lowered:
-                score -= 10
+                score -= 20
             if "concept" in lowered or "artwork" in lowered:
-                score -= 8
+                score -= 20
             ranked.append((score, url, alt))
 
         if ranked:
@@ -155,10 +134,7 @@ def choose_image(spec: dict[str, object]) -> tuple[str, str, str] | None:
 
 
 def download(url: str, destination: Path) -> None:
-    request = urllib.request.Request(
-        url,
-        headers={"User-Agent": "sts2dr-sprite-fetcher/3.0"},
-    )
+    request = urllib.request.Request(url, headers={"User-Agent": "sts2dr-sprite-fetcher/4.0"})
     with urllib.request.urlopen(request, timeout=60) as response:
         data = response.read()
     if not data:
@@ -166,14 +142,21 @@ def download(url: str, destination: Path) -> None:
     destination.write_bytes(data)
 
 
-def convert_first_frame(source: Path, destination: Path) -> None:
-    """Convert the first animation frame to an RGBA PNG using Pillow."""
+def convert_representative_frame(source: Path, destination: Path) -> None:
+    """Save a representative action frame, preferring the middle of animations."""
     from PIL import Image
 
     with Image.open(source) as image:
-        image.seek(0)
-        frame = image.convert("RGBA")
-        frame.save(destination, format="PNG", optimize=True)
+        try:
+            frame_count = getattr(image, "n_frames", 1)
+        except Exception:
+            frame_count = 1
+        frame_index = max(0, frame_count // 2)
+        try:
+            image.seek(frame_index)
+        except EOFError:
+            image.seek(0)
+        image.convert("RGBA").save(destination, format="PNG", optimize=True)
 
 
 def main() -> int:
@@ -186,19 +169,19 @@ def main() -> int:
         for target, spec in SOURCES.items():
             selected = choose_image(spec)
             if not selected:
-                raise RuntimeError(f"Could not find a verified battle-sprite image for {target}")
+                raise RuntimeError(f"Could not find the exact verified Deltarune artwork for {target}")
 
             page_path, caption, url = selected
             parsed_name = Path(urllib.parse.urlparse(url).path).name or "source.bin"
             source = temp / parsed_name
             print(f"{target} <- {page_path} -> {caption}")
             download(url, source)
-            convert_first_frame(source, OUT / target)
+            convert_representative_frame(source, OUT / target)
             resolved[target] = {"page": absolute_url(page_path), "caption": caption, "url": url}
 
         manifest = {
             "source": WIKI,
-            "description": "Real Deltarune Wiki battle/ACT/spell artwork, converted to static PNG first frames.",
+            "description": "Exact Deltarune Wiki battle/action/spell artwork. Animated sources use a representative action frame.",
             "files": resolved,
         }
         (OUT / "SPRITE_SOURCES.json").write_text(

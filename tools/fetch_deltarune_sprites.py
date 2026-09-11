@@ -1,82 +1,75 @@
 #!/usr/bin/env python3
-"""Generate card portraits from the actual Deltarune battle sprite animations."""
+"""Generate one individual card portrait for every Deltarune Acts card.
+
+The source pixels come from real Deltarune battle sprite frames in the
+DeltamodKit extraction. Every card receives its own PNG and its own matching
+4x PNG under images/card_portraits/big/.
+"""
 from __future__ import annotations
 
 import json
 import re
+import shutil
 import subprocess
 from pathlib import Path
-from urllib.request import Request, urlopen
 
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "DeltaruneActs" / "images" / "card_portraits"
 BIG = OUT / "big"
 
-# DeltamodKit contains the extracted Deltarune GameMaker battle sprites.
-# The exact commit is pinned so the generated art is reproducible.
 DELTAMODKIT_COMMIT = "aff71f3427fd764ca7b05ad8f93e660975fe6def"
 DELTAMODKIT = ROOT / ".deltamodkit"
 DELTAMODKIT_URL = "https://github.com/deltamodders/deltamodkit.git"
 
-# Every generated file has one explicit source sprite. These are real in-game
-# battle animations, not fan-made recreations.
+# Real in-game Deltarune battle sprite families.
 SOURCES = {
-    "kris_act.png": {
-        "sprite": "spr_krisb_act",
-        "character": "Kris",
-        "action": "ACT",
-    },
-    "ralsei_spell.png": {
-        "sprite": "spr_ralsei_spell",
-        "character": "Ralsei",
-        "action": "spell casting",
-    },
-    "susie_spell.png": {
-        "sprite": "spr_susieb_spell",
-        "character": "Susie",
-        "action": "spell casting",
-    },
-    "noelle_spell.png": {
-        "sprite": "spr_noelleb_spell",
-        "character": "Noelle",
-        "action": "spell casting",
-    },
+    "kris_act": {"sprite": "spr_krisb_act", "character": "Kris", "animation": "ACT"},
+    "ralsei_spell": {"sprite": "spr_ralsei_spell", "character": "Ralsei", "animation": "spell"},
+    "ralsei_spellready": {"sprite": "spr_ralsei_spellready", "character": "Ralsei", "animation": "spell ready"},
+    "susie_spell": {"sprite": "spr_susieb_spell", "character": "Susie", "animation": "spell"},
+    "susie_spellready": {"sprite": "spr_susieb_spellready", "character": "Susie", "animation": "spell ready"},
+    "susie_act": {"sprite": "spr_susieb_act", "character": "Susie", "animation": "ACT"},
+    "susie_actready": {"sprite": "spr_susieb_actready", "character": "Susie", "animation": "ACT ready"},
+    "noelle_spell": {"sprite": "spr_noelleb_spell", "character": "Noelle", "animation": "spell"},
+    "noelle_spellready": {"sprite": "spr_noelleb_spellready", "character": "Noelle", "animation": "spell ready"},
 }
 
-# Card -> exact in-game battle animation category.
-CARD_ART = {
-    "check": "kris_act",
-    "compliment": "kris_act",
-    "warn": "kris_act",
-    "joke": "kris_act",
-    "flirt": "kris_act",
-    "spare": "kris_act",
-    "healprayer": "ralsei_spell",
-    "dualheal": "ralsei_spell",
-    "pacify": "ralsei_spell",
-    "revivekris": "ralsei_spell",
-    "revivesong": "ralsei_spell",
-    "lightup": "ralsei_spell",
-    "healing": "susie_spell",
-    "okayheal": "susie_spell",
-    "betterheal": "susie_spell",
-    "ultraheal": "susie_spell",
-    "ultimateheal": "susie_spell",
-    "rudebuster": "susie_spell",
-    "redbuster": "susie_spell",
-    "dualbuster": "susie_spell",
-    "rudesword": "susie_spell",
-    "scythemare": "susie_spell",
-    "wakekris": "susie_spell",
-    # Noelle is the caster for all three of these. In the real game the
-    # caster pose comes from her spell animation while the spell effect is a
-    # separate layer.
-    "iceshock": "noelle_spell",
-    "snowgrave": "noelle_spell",
-    "sleepmist": "noelle_spell",
-}
+# Each card has its own output filename and its own source-frame selection.
+# These are not shared output assets. Where the game has multiple battle
+# sprite families for the same character, those are used to give the cards
+# additional genuine in-game variation.
+CARD_SPECS = {
+    "check": ("kris_act", 0),
+    "compliment": ("kris_act", 2),
+    "warn": ("kris_act", 4),
+    "joke": ("kris_act", 5),
+    "flirt": ("kris_act", 7),
+    "spare": ("kris_act", 8),
 
-EXPECTED = set(CARD_ART)
+    "healprayer": ("ralsei_spell", 0),
+    "dualheal": ("ralsei_spell", 2),
+    "pacify": ("ralsei_spell", 4),
+    "revivekris": ("ralsei_spell", 6),
+    "revivesong": ("ralsei_spellready", 2),
+    "lightup": ("ralsei_spellready", 5),
+
+    "healing": ("susie_spell", 0),
+    "okayheal": ("susie_spell", 2),
+    "betterheal": ("susie_spell", 4),
+    "ultraheal": ("susie_spell", 6),
+    "ultimateheal": ("susie_spell", 8),
+    "rudebuster": ("susie_spellready", 1),
+    "redbuster": ("susie_spellready", 4),
+    "dualbuster": ("susie_act", 2),
+    "rudesword": ("susie_act", 5),
+    "scythemare": ("susie_actready", 1),
+    "wakekris": ("susie_actready", 4),
+
+    # Noelle is the actual caster for all three of these spells.
+    "iceshock": ("noelle_spell", 1),
+    "snowgrave": ("noelle_spell", 4),
+    "sleepmist": ("noelle_spell", 7),
+}
 
 
 def run(cmd: list[str], cwd: Path | None = None) -> None:
@@ -104,26 +97,7 @@ def load_frames(sprite_name: str) -> list[str]:
     frames = re.findall(r'"%Name":"([0-9a-f-]+)"', match.group(1), flags=re.IGNORECASE)
     if not frames:
         raise RuntimeError(f"No frames found in {yy}")
-
     return frames
-
-
-def download_bytes(url: str) -> bytes:
-    request = Request(url, headers={"User-Agent": "sts2dr-deltamodkit-art/1.0"})
-    with urlopen(request, timeout=60) as response:
-        data = response.read()
-    if not data:
-        raise RuntimeError(f"Empty download: {url}")
-    return data
-
-
-def download_frame(sprite_name: str, frame_id: str, destination: Path) -> str:
-    source_name = f"{frame_id}.png"
-    local = DELTAMODKIT / "sprites" / sprite_name / source_name
-    if not local.exists():
-        raise RuntimeError(f"Missing frame image {local}")
-    destination.write_bytes(local.read_bytes())
-    return f"https://raw.githubusercontent.com/deltamodders/deltamodkit/{DELTAMODKIT_COMMIT}/sprites/{sprite_name}/{source_name}"
 
 
 def make_big(source: Path, destination: Path) -> None:
@@ -131,66 +105,139 @@ def make_big(source: Path, destination: Path) -> None:
 
     with Image.open(source) as image:
         image = image.convert("RGBA")
-        # Nearest-neighbour preserves the crisp pixel-art edges.
-        scale = 4
-        enlarged = image.resize((image.width * scale, image.height * scale), Image.Resampling.NEAREST)
+        enlarged = image.resize(
+            (image.width * 4, image.height * 4),
+            Image.Resampling.NEAREST,
+        )
         enlarged.save(destination, format="PNG", optimize=True)
 
 
+def discover_cards() -> set[str]:
+    cards_dir = ROOT / "DeltaruneActs" / "Cards"
+    return {
+        path.stem.lower()
+        for path in cards_dir.glob("*.cs")
+        if path.stem != "DeltaruneActsCard"
+    }
+
+
+def validate_card_table() -> None:
+    actual = discover_cards()
+    expected = set(CARD_SPECS)
+    if actual != expected:
+        missing = sorted(actual - expected)
+        extra = sorted(expected - actual)
+        raise RuntimeError(
+            "CARD_SPECS does not exactly match the C# card classes. "
+            f"Missing specs={missing}; unknown specs={extra}"
+        )
+
+
+def cleanup_old_generated_art() -> None:
+    # Remove previous shared/generated PNGs so stale assets cannot be mistaken
+    # for current card art. Leave non-PNG files such as SVG/source manifests.
+    for path in OUT.glob("*.png"):
+        path.unlink()
+    if BIG.exists():
+        for path in BIG.glob("*.png"):
+            path.unlink()
+
+
 def main() -> int:
+    validate_card_table()
+    checkout_source_repo()
+    cleanup_old_generated_art()
     OUT.mkdir(parents=True, exist_ok=True)
     BIG.mkdir(parents=True, exist_ok=True)
-    checkout_source_repo()
 
-    source_meta: dict[str, dict[str, str]] = {}
-    generated = set()
-
-    for category, spec in SOURCES.items():
+    frames_by_source: dict[str, list[str]] = {}
+    source_meta: dict[str, dict[str, object]] = {}
+    for source_key, spec in SOURCES.items():
         frames = load_frames(spec["sprite"])
-        # Use the middle frame of the actual animation as the static card art.
-        frame_id = frames[len(frames) // 2]
-        target = OUT / category
-        source_url = download_frame(spec["sprite"], frame_id, target)
-        make_big(target, BIG / category)
-        source_meta[category] = {
-            "source_repository": "https://github.com/deltamodders/deltamodkit",
-            "source_commit": DELTAMODKIT_COMMIT,
+        frames_by_source[source_key] = frames
+        source_meta[source_key] = {
             "sprite": spec["sprite"],
             "character": spec["character"],
-            "action": spec["action"],
-            "frame": frame_id,
-            "frame_url": source_url,
+            "animation": spec["animation"],
+            "frame_count": len(frames),
         }
-        print(f"Generated {category}: {spec['character']} / {spec['action']} / frame {frame_id}")
 
-    # Produce one manifest entry per card so it is possible to audit exactly
-    # which real animation family each card displays.
-    manifest_cards: dict[str, dict[str, str]] = {}
-    for card, category in sorted(CARD_ART.items()):
-        manifest_cards[card] = {
-            "asset": f"{category}.png",
-            "big_asset": f"big/{category}.png",
-            "character": source_meta[f"{category}.png"]["character"],
-            "action": source_meta[f"{category}.png"]["action"],
-            "sprite": source_meta[f"{category}.png"]["sprite"],
-            "frame": source_meta[f"{category}.png"]["frame"],
-            "source_url": source_meta[f"{category}.png"]["frame_url"],
+    cards: dict[str, dict[str, object]] = {}
+    output_paths: set[str] = set()
+    big_paths: set[str] = set()
+
+    for card, (source_key, frame_index) in sorted(CARD_SPECS.items()):
+        spec = SOURCES[source_key]
+        frames = frames_by_source[source_key]
+        if frame_index < 0 or frame_index >= len(frames):
+            raise RuntimeError(
+                f"Frame index {frame_index} is out of range for {spec['sprite']} "
+                f"({len(frames)} frames) while generating {card}.png"
+            )
+
+        frame_id = frames[frame_index]
+        source = DELTAMODKIT / "sprites" / spec["sprite"] / f"{frame_id}.png"
+        if not source.is_file():
+            raise RuntimeError(f"Missing source frame: {source}")
+
+        target = OUT / f"{card}.png"
+        big_target = BIG / f"{card}.png"
+        target.write_bytes(source.read_bytes())
+        make_big(target, big_target)
+
+        output_rel = target.relative_to(OUT).as_posix()
+        big_rel = big_target.relative_to(OUT).as_posix()
+        if output_rel in output_paths or big_rel in big_paths:
+            raise RuntimeError(f"Duplicate output asset path detected for {card}")
+        output_paths.add(output_rel)
+        big_paths.add(big_rel)
+
+        cards[card] = {
+            "asset": output_rel,
+            "big_asset": big_rel,
+            "character": spec["character"],
+            "animation": spec["animation"],
+            "source_sprite": spec["sprite"],
+            "source_commit": DELTAMODKIT_COMMIT,
+            "frame_index": frame_index,
+            "frame_id": frame_id,
+            "source_url": (
+                f"https://raw.githubusercontent.com/deltamodders/deltamodkit/"
+                f"{DELTAMODKIT_COMMIT}/sprites/{spec['sprite']}/{frame_id}.png"
+            ),
         }
-        generated.add(card)
 
-    if generated != EXPECTED:
-        raise RuntimeError(f"Card asset coverage mismatch. Missing={sorted(EXPECTED - generated)} extra={sorted(generated - EXPECTED)}")
+    expected_cards = discover_cards()
+    if set(cards) != expected_cards:
+        raise RuntimeError(f"Generated card coverage mismatch: {sorted(set(cards) ^ expected_cards)}")
+    if len(output_paths) != len(cards) or len(big_paths) != len(cards):
+        raise RuntimeError("Each card must have a unique normal asset and unique big asset")
+
+    for card in cards:
+        normal = OUT / cards[card]["asset"]
+        large = OUT / cards[card]["big_asset"]
+        if not normal.is_file() or not large.is_file():
+            raise RuntimeError(f"Missing final portrait for {card}")
 
     manifest = {
-        "description": "Verified Deltarune in-game battle sprite frames extracted from DeltamodKit.",
+        "description": (
+            "One individual card portrait per Deltarune Acts card, using real "
+            "Deltarune battle sprite frames extracted from DeltamodKit."
+        ),
         "source_repository": "https://github.com/deltamodders/deltamodkit",
         "source_commit": DELTAMODKIT_COMMIT,
-        "note": "Cards are static, so each portrait uses the middle frame of the real battle animation. Both normal and big portraits come from that same frame.",
-        "cards": manifest_cards,
+        "individual_card_assets": True,
+        "card_count": len(cards),
+        "cards": cards,
     }
     (OUT / "SPRITE_SOURCES.json").write_text(
-        json.dumps(manifest, indent=2, ensure_ascii=False) + "\n", encoding="utf-8"
+        json.dumps(manifest, indent=2, ensure_ascii=False) + "\n",
+        encoding="utf-8",
     )
+
+    print(f"Generated {len(cards)} individual card portraits.")
+    print("Normal assets:", len(output_paths))
+    print("Big assets:", len(big_paths))
     return 0
 
 

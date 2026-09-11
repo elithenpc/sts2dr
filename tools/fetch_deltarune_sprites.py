@@ -9,7 +9,6 @@ from __future__ import annotations
 
 import json
 import re
-import shutil
 import subprocess
 from pathlib import Path
 
@@ -35,9 +34,7 @@ SOURCES = {
 }
 
 # Each card has its own output filename and its own source-frame selection.
-# These are not shared output assets. Where the game has multiple battle
-# sprite families for the same character, those are used to give the cards
-# additional genuine in-game variation.
+# These source families are genuine Deltarune battle sprite animations.
 CARD_SPECS = {
     "check": ("kris_act", 0),
     "compliment": ("kris_act", 2),
@@ -51,7 +48,7 @@ CARD_SPECS = {
     "pacify": ("ralsei_spell", 4),
     "revivekris": ("ralsei_spell", 6),
     "revivesong": ("ralsei_spellready", 2),
-    "lightup": ("ralsei_spellready", 5),
+    "lightup": ("ralsei_spellready", 3),
 
     "healing": ("susie_spell", 0),
     "okayheal": ("susie_spell", 2),
@@ -59,11 +56,11 @@ CARD_SPECS = {
     "ultraheal": ("susie_spell", 6),
     "ultimateheal": ("susie_spell", 8),
     "rudebuster": ("susie_spellready", 1),
-    "redbuster": ("susie_spellready", 4),
+    "redbuster": ("susie_spellready", 3),
     "dualbuster": ("susie_act", 2),
     "rudesword": ("susie_act", 5),
     "scythemare": ("susie_actready", 1),
-    "wakekris": ("susie_actready", 4),
+    "wakekris": ("susie_actready", 3),
 
     # Noelle is the actual caster for all three of these spells.
     "iceshock": ("noelle_spell", 1),
@@ -134,8 +131,6 @@ def validate_card_table() -> None:
 
 
 def cleanup_old_generated_art() -> None:
-    # Remove previous shared/generated PNGs so stale assets cannot be mistaken
-    # for current card art. Leave non-PNG files such as SVG/source manifests.
     for path in OUT.glob("*.png"):
         path.unlink()
     if BIG.exists():
@@ -151,30 +146,19 @@ def main() -> int:
     BIG.mkdir(parents=True, exist_ok=True)
 
     frames_by_source: dict[str, list[str]] = {}
-    source_meta: dict[str, dict[str, object]] = {}
     for source_key, spec in SOURCES.items():
-        frames = load_frames(spec["sprite"])
-        frames_by_source[source_key] = frames
-        source_meta[source_key] = {
-            "sprite": spec["sprite"],
-            "character": spec["character"],
-            "animation": spec["animation"],
-            "frame_count": len(frames),
-        }
+        frames_by_source[source_key] = load_frames(spec["sprite"])
 
     cards: dict[str, dict[str, object]] = {}
     output_paths: set[str] = set()
     big_paths: set[str] = set()
 
-    for card, (source_key, frame_index) in sorted(CARD_SPECS.items()):
+    for card, (source_key, requested_frame_index) in sorted(CARD_SPECS.items()):
         spec = SOURCES[source_key]
         frames = frames_by_source[source_key]
-        if frame_index < 0 or frame_index >= len(frames):
-            raise RuntimeError(
-                f"Frame index {frame_index} is out of range for {spec['sprite']} "
-                f"({len(frames)} frames) while generating {card}.png"
-            )
-
+        # Some Deltarune battle-state sprites have fewer frames. Wrap the
+        # requested slot rather than ever falling back to another character.
+        frame_index = requested_frame_index % len(frames)
         frame_id = frames[frame_index]
         source = DELTAMODKIT / "sprites" / spec["sprite"] / f"{frame_id}.png"
         if not source.is_file():
@@ -199,6 +183,7 @@ def main() -> int:
             "animation": spec["animation"],
             "source_sprite": spec["sprite"],
             "source_commit": DELTAMODKIT_COMMIT,
+            "requested_frame_index": requested_frame_index,
             "frame_index": frame_index,
             "frame_id": frame_id,
             "source_url": (

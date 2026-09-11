@@ -23,20 +23,39 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y python3-pil
 
-      - name: Generate verified real Deltarune battle-sprite portraits
+      - name: Generate one real sprite asset per card
         run: python3 tools/fetch_deltarune_sprites.py
 
-      - name: Verify every card asset exists
+      - name: Verify one individual normal and big portrait per card
         run: |
           python3 - <<'PY'
           import json
           from pathlib import Path
 
           root = Path("DeltaruneActs/images/card_portraits")
-          manifest = json.loads((root / "SPRITE_SOURCES.json").read_text(encoding="utf-8"))
+          cards_dir = Path("DeltaruneActs/Cards")
+          manifest_path = root / "SPRITE_SOURCES.json"
+          manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
           cards = manifest.get("cards", {})
-          if not cards:
-              raise SystemExit("No card artwork entries were generated")
+
+          expected = {
+              p.stem.lower()
+              for p in cards_dir.glob("*.cs")
+              if p.stem != "DeltaruneActsCard"
+          }
+          actual = set(cards)
+          if actual != expected:
+              raise SystemExit(
+                  f"Card coverage mismatch. Missing={sorted(expected - actual)} "
+                  f"Extra={sorted(actual - expected)}"
+              )
+
+          normal = [item["asset"] for item in cards.values()]
+          big = [item["big_asset"] for item in cards.values()]
+          if len(normal) != len(set(normal)):
+              raise SystemExit("Two cards share the same normal portrait asset")
+          if len(big) != len(set(big)):
+              raise SystemExit("Two cards share the same big portrait asset")
 
           missing = []
           for card, item in cards.items():
@@ -44,9 +63,13 @@ jobs:
                   if not (root / rel).is_file():
                       missing.append(f"{card}: {rel}")
           if missing:
-              raise SystemExit("Missing generated card art:\n" + "\n".join(missing))
+              raise SystemExit("Missing generated portraits:\n" + "\n".join(missing))
 
-          print(f"Verified {len(cards)} card artwork entries and both portrait sizes.")
+          for card, item in cards.items():
+              if not item.get("source_sprite") or not item.get("source_url"):
+                  raise SystemExit(f"No verified source metadata for {card}")
+
+          print(f"Verified {len(cards)} cards with {len(normal)} unique normal portraits and {len(big)} unique big portraits.")
           PY
 
       - name: Commit generated sprite portraits
@@ -58,5 +81,5 @@ jobs:
             echo "Sprite portraits are already up to date."
             exit 0
           fi
-          git commit -m "Prepare verified Deltarune sprite card art"
+          git commit -m "Prepare individual Deltarune sprite card art"
           git push

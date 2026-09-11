@@ -15,8 +15,32 @@ public abstract class DeltaruneActsCard(int cost, CardType type, CardRarity rari
 
     private static string CardName(string entry) => entry.RemovePrefix().ToLowerInvariant();
 
-    // Every card gets its own portrait file. The art generator creates one
-    // real Deltarune battle-sprite frame per card and a matching 4x big image.
+    public int RequiredTP => GetType().Name switch
+    {
+        nameof(HealPrayer) => 32,
+        nameof(DualHeal) => 50,
+        nameof(Pacify) => 16,
+        nameof(ReviveKris) => 16,
+        nameof(ReviveSong) => 84,
+        nameof(LightUp) => 1,
+        nameof(Healing) => 75,
+        nameof(OkayHeal) => 50,
+        nameof(BetterHeal) => 75,
+        nameof(UltraHeal) => 85,
+        nameof(UltimateHeal) => 100,
+        nameof(RudeBuster) => 50,
+        nameof(RedBuster) => 60,
+        nameof(DualBuster) => 100,
+        nameof(RudeSword) => 50,
+        nameof(Scythemare) => 40,
+        nameof(WakeKris) => 16,
+        nameof(IceShock) => 16,
+        nameof(SnowGrave) => 100,
+        nameof(SleepMist) => 32,
+        nameof(Spare) => 50,
+        _ => 0
+    };
+
     public override string PortraitPath => $"{ArtRoot}{CardName(Id.Entry)}.png";
     public override string CustomPortraitPath => $"{BigArtRoot}{CardName(Id.Entry)}.png";
     public override string BetaPortraitPath => PortraitPath;

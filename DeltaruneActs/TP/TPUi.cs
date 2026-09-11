@@ -48,9 +48,8 @@ internal static class TPCombatUiExitTreePatch
 
 internal sealed partial class TPDisplay : Control
 {
-    private const string SpritePath = "res://DeltaruneActs/images/card_portraits/tp_kris.png";
-
     private readonly TPMeter _meter;
+    private readonly Label _tpLabel;
     private readonly Label _percentLabel;
 
     public TPDisplay()
@@ -59,67 +58,52 @@ internal sealed partial class TPDisplay : Control
         MouseFilter = MouseFilterEnum.Ignore;
         ZIndex = 100;
 
-        // Deltarune's TP meter is a tall vertical gauge on the left side.
+        // Deltarune places the large TP meter on the left edge of the battle UI.
         AnchorLeft = 0f;
         AnchorRight = 0f;
         AnchorTop = 0.5f;
         AnchorBottom = 0.5f;
-        OffsetLeft = 8f;
-        OffsetRight = 118f;
-        OffsetTop = -185f;
-        OffsetBottom = 185f;
+        OffsetLeft = 10f;
+        OffsetRight = 106f;
+        OffsetTop = -182f;
+        OffsetBottom = 182f;
 
         _meter = new TPMeter
         {
-            Position = new Vector2(54f, 36f),
-            Size = new Vector2(26f, 288f)
+            Position = new Vector2(60f, 18f),
+            Size = new Vector2(22f, 328f)
         };
         AddChild(_meter);
 
-        var tpLabel = new Label
-        {
-            Text = "TP",
-            Position = new Vector2(2f, 128f),
-            Size = new Vector2(46f, 28f),
-            HorizontalAlignment = HorizontalAlignment.Center,
-            VerticalAlignment = VerticalAlignment.Center
-        };
-        tpLabel.AddThemeFontSizeOverride("font_size", 17);
-        tpLabel.AddThemeColorOverride("font_color", Colors.White);
-        tpLabel.AddThemeColorOverride("font_shadow_color", Colors.Black);
-        tpLabel.AddThemeConstantOverride("shadow_offset_x", 2);
-        tpLabel.AddThemeConstantOverride("shadow_offset_y", 2);
-        AddChild(tpLabel);
+        _tpLabel = MakeLabel("TP", 20);
+        _tpLabel.Position = new Vector2(0f, 106f);
+        _tpLabel.Size = new Vector2(52f, 34f);
+        AddChild(_tpLabel);
 
-        _percentLabel = new Label
-        {
-            Text = "0%",
-            Position = new Vector2(0f, 154f),
-            Size = new Vector2(50f, 30f),
-            HorizontalAlignment = HorizontalAlignment.Center,
-            VerticalAlignment = VerticalAlignment.Center
-        };
-        _percentLabel.AddThemeFontSizeOverride("font_size", 17);
-        _percentLabel.AddThemeColorOverride("font_color", Colors.White);
-        _percentLabel.AddThemeColorOverride("font_shadow_color", Colors.Black);
-        _percentLabel.AddThemeConstantOverride("shadow_offset_x", 2);
-        _percentLabel.AddThemeConstantOverride("shadow_offset_y", 2);
+        _percentLabel = MakeLabel("0%", 20);
+        _percentLabel.Position = new Vector2(0f, 142f);
+        _percentLabel.Size = new Vector2(52f, 36f);
         AddChild(_percentLabel);
-
-        // Use a real Deltarune battle sprite as the TP ornament.
-        var sprite = new TextureRect
-        {
-            Texture = GD.Load<Texture2D>(SpritePath),
-            Position = new Vector2(76f, 6f),
-            Size = new Vector2(34f, 50f),
-            ExpandMode = TextureRect.ExpandModeEnum.IgnoreSize,
-            StretchMode = TextureRect.StretchModeEnum.KeepAspectCentered,
-            MouseFilter = MouseFilterEnum.Ignore
-        };
-        AddChild(sprite);
 
         TPManager.Changed += Refresh;
         TreeExiting += OnTreeExiting;
+    }
+
+    private static Label MakeLabel(string text, int fontSize)
+    {
+        var label = new Label
+        {
+            Text = text,
+            HorizontalAlignment = HorizontalAlignment.Center,
+            VerticalAlignment = VerticalAlignment.Center,
+            MouseFilter = MouseFilterEnum.Ignore
+        };
+        label.AddThemeFontSizeOverride("font_size", fontSize);
+        label.AddThemeColorOverride("font_color", Colors.White);
+        label.AddThemeColorOverride("font_shadow_color", Colors.Black);
+        label.AddThemeConstantOverride("shadow_offset_x", 2);
+        label.AddThemeConstantOverride("shadow_offset_y", 2);
+        return label;
     }
 
     public void Refresh()
@@ -146,25 +130,39 @@ internal sealed partial class TPMeter : Control
     public override void _Draw()
     {
         const float width = 22f;
-        const float height = 286f;
-        const float inset = 4f;
+        const float height = 328f;
 
+        // Pixel-style outer silhouette.
         var outer = new Rect2(0f, 0f, width, height);
-        DrawRect(outer, new Color(0.03f, 0.03f, 0.04f, 1f), true);
-        DrawRect(outer, new Color(0.95f, 0.95f, 0.95f, 1f), false, 2f);
+        DrawRect(outer, Colors.Black, true);
 
+        // Thin pale frame used by the battle meter.
+        DrawRect(new Rect2(2f, 2f, width - 4f, height - 4f), new Color(0.82f, 0.82f, 0.76f, 1f), true);
+        DrawRect(new Rect2(4f, 4f, width - 8f, height - 8f), new Color(0.12f, 0.09f, 0.07f, 1f), true);
+
+        const float inset = 5f;
         var inner = new Rect2(inset, inset, width - inset * 2f, height - inset * 2f);
-        DrawRect(inner, new Color(0.15f, 0.06f, 0.02f, 1f), true);
+
+        // Empty portion stays dark. TP fills from the bottom upward.
+        DrawRect(inner, new Color(0.18f, 0.16f, 0.13f, 1f), true);
 
         var amount = Math.Clamp(Value, 0, 100) / 100f;
         var fillHeight = inner.Size.Y * amount;
-        if (fillHeight > 0f)
-        {
-            var fill = new Rect2(inner.Position.X, inner.End.Y - fillHeight, inner.Size.X, fillHeight);
-            DrawRect(fill, new Color(1f, 0.58f, 0.05f, 1f), true);
+        if (fillHeight <= 0f)
+            return;
 
-            var edgeY = inner.End.Y - fillHeight;
-            DrawLine(new Vector2(inner.Position.X, edgeY), new Vector2(inner.End.X, edgeY), Colors.White, 1f);
-        }
+        var fill = new Rect2(inner.Position.X, inner.End.Y - fillHeight, inner.Size.X, fillHeight);
+
+        // Deltarune-style orange/yellow TP fill.
+        DrawRect(fill, new Color(1f, 0.58f, 0.08f, 1f), true);
+
+        // Bright top edge gives the fill its crisp pixel silhouette.
+        var edgeY = inner.End.Y - fillHeight;
+        DrawLine(
+            new Vector2(inner.Position.X, edgeY),
+            new Vector2(inner.End.X, edgeY),
+            Colors.White,
+            1f
+        );
     }
 }
